@@ -1,0 +1,50 @@
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+import { UserRoomRelation } from './user-room-relation.entity';
+import { Message } from './message.entity';
+import { ReaderMessageRelation } from './reader-message-relation.entity';
+
+@Entity()
+export class User {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column()
+  username: string;
+
+  @Column({ unique: true })
+  email: string;
+
+  @Column()
+  password: string;
+
+  @Column({ nullable: true })
+  profilePictureUrl: string;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+
+  @OneToMany(
+    () => UserRoomRelation,
+    (userRoomRelation) => userRoomRelation.user,
+  )
+  userRoomRelations: UserRoomRelation[];
+
+  @OneToMany(() => Message, (message) => message.sender)
+  messages: Message[];
+
+  @OneToMany(
+    () => ReaderMessageRelation,
+    (readerMessageRelation) => readerMessageRelation.reader,
+  )
+  readerMessageRelations: ReaderMessageRelation[];
+}
