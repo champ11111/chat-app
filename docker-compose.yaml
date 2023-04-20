@@ -1,8 +1,5 @@
 version: '3.7'
 
-networks:
-  tuder: {}
-
 services:
   database:
     image: postgres:15
@@ -11,12 +8,10 @@ services:
       - database-storage:/var/lib/postgresql/data
     environment:
       POSTGRES_PASSWORD: password
-      POSTGRES_DB: tuder
+      POSTGRES_DB: chapabc
       POSTGRES_USER: user
     ports:
       - 5432:5432
-    networks:
-      - tuder
 
 volumes:
   database-storage:
