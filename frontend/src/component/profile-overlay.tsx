@@ -33,7 +33,7 @@ export default function ProfileOverlay(prop: Props) {
             )}
             
             <button className="bg-blue-500 text-white py-2 px-4 rounded-md w-full"
-            onClick={()=>setIsOpen(false)}>
+            onClick={()=>prop.setIsOpen(false)}>
                 Cancel
             </button>
         </div>
