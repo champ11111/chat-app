@@ -7,7 +7,7 @@ export default function ChatPage(){
     return (
         <div id="chat-page" className= "flex w">
             <Sidebar/>
-            <div id = "main" className = "w-full">
+            <div id = "main" className = "w-3/4">
                 <Chatroom/>
             </div>
         </div>
