@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 type Message = {
   id: number;
@@ -10,6 +11,7 @@ type Message = {
 export default function ChatRoom() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
+  const navigate = useNavigate();
 
   const handleNewMessage = () => {
     const message: Message = {
@@ -22,12 +24,21 @@ export default function ChatRoom() {
     setNewMessage("");
   };
 
+  const handleSignout = () => {
+    localStorage.removeItem("token");
+    navigate("/");
+  };
+
+
   return (
     <div className="h-screen flex flex-col">
       <div className="bg-gray-800 py-2 px-4 text-gray-200 flex items-center justify-between">
         <h1 className="text-lg font-bold">Chatroom</h1>
         <div className="flex items-center space-x-4">
-          <button className="bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded">
+          <button 
+            className="bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded"
+            onClick={handleSignout}  
+          >
             Sign out
           </button>
           <div className="bg-gray-700 rounded-full w-8 h-8 flex items-center justify-center">
