@@ -7,9 +7,13 @@ export class UserRoomRelation {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => User, (user) => user.userRoomRelations)
+  @ManyToOne(
+    () => User, (user) => user.userRoomRelations,
+    {onDelete: 'CASCADE'})
   user: User;
 
-  @ManyToOne(() => Room, (room) => room.userRoomRelations)
+  @ManyToOne(
+    () => Room, (room) => room.userRoomRelations,
+    {onDelete: 'CASCADE'})
   room: Room;
 }

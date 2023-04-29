@@ -39,15 +39,19 @@ export class User {
   @OneToMany(
     () => UserRoomRelation,
     (userRoomRelation) => userRoomRelation.user,
+    {onDelete: 'CASCADE'}
   )
   userRoomRelations: UserRoomRelation[];
 
-  @OneToMany(() => Message, (message) => message.sender)
+  @OneToMany(
+    () => Message, (message) => message.sender,
+    {onDelete: 'CASCADE'})
   messages: Message[];
 
   @OneToMany(
     () => ReaderMessageRelation,
     (readerMessageRelation) => readerMessageRelation.reader,
+    {onDelete: 'CASCADE'}
   )
   readerMessageRelations: ReaderMessageRelation[];
 }

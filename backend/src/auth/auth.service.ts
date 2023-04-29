@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { NotFoundException,ConflictException, Injectable, BadRequestException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { compare } from 'bcrypt';
 
@@ -26,7 +26,7 @@ export class AuthService {
     //Check if email is already in use
     const userWithEmail = await this.userService.findOneByEmail(dto.email);
     if (userWithEmail) {
-      throw new BadRequestException('Email is already in use');
+      throw new ConflictException('Email is already in use');
     }
     const user = await this.userService.create(dto);
     const accessToken = await this.getTokenForUser(user.id);

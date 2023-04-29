@@ -36,12 +36,19 @@ export class Message {
   @OneToMany(
     () => ReaderMessageRelation,
     (readerMessageRelation) => readerMessageRelation.message,
+    {onDelete: 'CASCADE'}
   )
   readerMessageRelations: ReaderMessageRelation[];
 
-  @ManyToOne(() => User, (user) => user.messages)
+  @ManyToOne(
+    () => User, (user) => user.messages,
+    {onDelete: 'CASCADE'}
+    )
   sender: User;
 
-  @ManyToOne(() => Room, (room) => room.messages)
+  @ManyToOne(
+    () => Room, (room) => room.messages,
+    {onDelete: 'CASCADE'}
+    )
   room: Room;
 }
