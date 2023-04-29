@@ -1,4 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { 
+  Injectable,
+  NotFoundException,
+  ConflictException,
+  BadRequestException
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -18,7 +23,7 @@ export class MessageService {
   async findMessages(): Promise<Message[]> {
     //find all messages
     const messages = await this.repo.find({
-      relations: ['readerMessageRelations', 'readerMessageRelations.reader'],
+      relations: ['readerMessageRelations', 'readerMessageRelations.reader', 'sender', 'room'],
     });
     return messages;
   }
@@ -27,26 +32,29 @@ export class MessageService {
     //find all messages by room id
     const messages = await this.repo.find({
       where: { room: { id: roomId } },
-      relations: ['readerMessageRelations', 'readerMessageRelations.reader'],
+      relations: ['readerMessageRelations', 'readerMessageRelations.reader', 'sender', 'room'],
     });
     return messages;
   }
 
   async createMessage(dto: CreateMessageDto): Promise<Message> {
     //check if room exists
-    const room = await this.roomRepo.findOne({ where: { id: dto.roomId } });
+    const room = await this.roomRepo.findOne({ where: { id: dto.roomId }, relations: ['userRoomRelations', 'userRoomRelations.user'] });
     if (!room) {
-      throw new Error('Room not found');
+      throw new NotFoundException('Room not found');
     }
-
+    const users = room.userRoomRelations.map((relation) => relation.user.id);
+    if(!users.includes(dto.senderId)) {
+      throw new ConflictException('User is not in this chatroom');
+    }
     if (!dto.senderId) {
-      throw new Error('Sender not found');
+      throw new BadRequestException('Invalid payload');
     }
 
     //check if sender exists
     const sender = await this.userRepo.findOne({ where: { id: dto.senderId } });
     if (!sender) {
-      throw new Error('Sender not found');
+      throw new NotFoundException('Sender not found');
     }
     //create a new message with room id and sender id
     const message = new Message();
@@ -64,12 +72,12 @@ export class MessageService {
       relations: ['readerMessageRelations'],
     });
     if (!message) {
-      throw new Error('Message not found');
+      throw new NotFoundException('Message not found');
     }
     //find user by id
     const user = await this.userRepo.findOne({ where: { id: userId } });
     if (!user) {
-      throw new Error('User not found');
+      throw new NotFoundException('User not found');
     }
     //check if message has already been read by user
     const existingRelation = message.readerMessageRelations.find(
@@ -96,7 +104,7 @@ export class MessageService {
     const message = await this.repo.findOne({ where: { id: messageId } });
     console.log(message);
     if (!message) {
-      throw new Error('Message not found');
+      throw new NotFoundException('Message not found');
     }
     //delete message cascade
     await this.repo.delete(message);
