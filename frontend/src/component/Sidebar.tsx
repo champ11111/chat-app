@@ -2,7 +2,7 @@ import React,{ReactNode, useState, useRef, useEffect} from 'react';
 import ProfileOverlay from './ProfileModal';
 import ProfileCard from './ProfileCard';
 import MyProfileCard from './MyProfileCard';
-import Collapse from './collapse';
+import Collapse from './Collapse';
 import { PlusSquareFilled } from '@ant-design/icons';
 
 
