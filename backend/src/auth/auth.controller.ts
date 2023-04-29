@@ -1,8 +1,6 @@
 import {
   Body,
   Controller,
-  Get,
-  HttpCode,
   Post,
   Res,
   UploadedFile,
