@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 
 import { Room, User, UserRoomRelation } from 'src/entities';
 import { CreateRoomDto } from './dto/create-room.dto';
+import { ImageService } from 'src/image/image.service';
 
 @Injectable()
 export class RoomService {
@@ -12,6 +13,7 @@ export class RoomService {
     @InjectRepository(User) private userRepo: Repository<User>,
     @InjectRepository(UserRoomRelation)
     private userRoomRelationRepo: Repository<UserRoomRelation>,
+    private readonly imageService: ImageService,
   ) {}
 
   async findRooms(): Promise<Room[]> {
@@ -27,7 +29,18 @@ export class RoomService {
     });
   }
 
-  async createRoom(dto: CreateRoomDto): Promise<Room> {
+  async createRoom(
+    dto: CreateRoomDto,
+    file: Express.Multer.File,
+  ): Promise<Room> {
+    if (file) {
+      const profilePictureUrl = await this.imageService.uploadImageToS3(file);
+      dto.groupPictureUrl = profilePictureUrl;
+    } else {
+      dto.groupPictureUrl =
+        'https://geodash.gov.bd/uploaded/people_group/default_group.png';
+    }
+
     const room = new Room();
     room.name = dto.name;
     room.isGroupChat = dto.isGroupChat;

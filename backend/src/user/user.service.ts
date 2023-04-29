@@ -5,11 +5,13 @@ import { Repository } from 'typeorm';
 
 import { User } from 'src/entities';
 import { CreateUserDto } from './dto/create-user.dto';
+import { ImageService } from 'src/image/image.service';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User) private readonly repo: Repository<User>,
+    private readonly imageService: ImageService,
   ) {}
 
   //Find all users
@@ -21,7 +23,11 @@ export class UserService {
   async findOneById(id: number): Promise<User> {
     const user = await this.repo.findOne({
       where: { id },
-      relations: ['userRoomRelations', 'userRoomRelations.room'],
+      relations: [
+        'userRoomRelations',
+        'userRoomRelations.room',
+        'userRoomRelations.user',
+      ],
     });
     return user;
   }
@@ -49,7 +55,11 @@ export class UserService {
   }
 
   //Update a user
-  async update(id: number, dto: CreateUserDto): Promise<User> {
+  async update(
+    id: number,
+    dto: CreateUserDto,
+    file: Express.Multer.File,
+  ): Promise<User> {
     const user = await this.findOneById(id);
     if (!user) {
       throw new Error('User not found');
@@ -58,6 +68,13 @@ export class UserService {
     if (dto.password) {
       user.password = await hash(dto.password, 10);
     }
+
+    if (file) {
+      const profilePictureUrl = await this.imageService.uploadImageToS3(file);
+      user.profilePictureUrl = profilePictureUrl;
+    }
+
+    Object.assign(user, dto);
 
     return this.repo.save(user);
   }
