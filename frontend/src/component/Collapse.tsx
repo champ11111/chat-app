@@ -22,7 +22,7 @@ const Collapse: FC<Props> = ({ type, items }) => {
     return (
         <div className='flex flex-col'>
             <div className='flex items-center justify-between p-2'>
-                <p className='text-l font-bold text-gray-800'>
+                <p className='text-l font-bold text-gray-800 dark:text-white'>
                     {type}
                 </p>
                 {collapsed ? (

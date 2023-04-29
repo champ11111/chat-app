@@ -10,9 +10,7 @@ interface Props {
 
 const ProfileCard: FC<Props> = ({ type, imageUrl, nickname, isFriend }) => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
-  useEffect(() => {
-    console.log("isModalOpen", isModalOpen)
-  }, [isModalOpen])
+
   return (
     <>
       <ProfileModal
@@ -32,7 +30,7 @@ const ProfileCard: FC<Props> = ({ type, imageUrl, nickname, isFriend }) => {
           src={imageUrl}
           alt="Profile image"
         />
-        <p className="font-bold ml-2">
+        <p className="font-bold ml-2 dark:text-white">
           {nickname}
         </p>
       </div>
