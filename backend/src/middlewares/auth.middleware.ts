@@ -14,11 +14,8 @@ export class AuthMiddleware implements NestMiddleware {
     const token = (req.headers.authorization ?? '').split('Bearer ')[1];
     try {
       const { uid } = await this.authService.verifyToken(token);
-      //TODO: uncomment this line to enable authentication
       if (uid) {
         req.uid = uid;
-      } else {
-        req.uid = 1;
       }
     } catch (err) {
       req.uid = undefined;
