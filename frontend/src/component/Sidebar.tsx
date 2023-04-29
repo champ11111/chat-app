@@ -1,26 +1,25 @@
-import React,{ReactNode, useState, useRef, useEffect} from 'react';
+import React,{FC, ReactNode, useState, useRef, useEffect} from 'react';
 import ProfileOverlay from './ProfileModal';
 import ProfileCard from './ProfileCard';
 import MyProfileCard from './MyProfileCard';
 import Collapse from './Collapse';
 import { PlusSquareFilled } from '@ant-design/icons';
 
+interface Props {
+    myProfile: {
+        imageUrl: string;
+        nickname: string;
+    };
+    items: {
+        imageUrl: string;
+        nickname: string;
+        isFriend: boolean;
+    }[];
+}
 
-export default function Sidebar() {
-    const [myProfile, setMyProfile] = useState({
-        imageUrl: "https://chapabc.s3.us-west-1.amazonaws.com/defaultProfile.jpeg",
-        nickname: 'Andrew Ng',
-    })
-    const [items, setItems] = useState([
-        {
-            imageUrl: "https://chapabc.s3.us-west-1.amazonaws.com/defaultProfile.jpeg",
-            nickname: 'Andrew Ng',
-        },
-        {
-            imageUrl: "https://chapabc.s3.us-west-1.amazonaws.com/defaultProfile.jpeg",
-            nickname: 'Andrew Ng',
-        },
-    ])
+const Sidebar: FC<Props> = ({myProfile, items}) => { 
+    
+
     return (
         <div className="flex flex-col w-1/4 h-screen">
             <div className="flex justify-between p-2 border-b border-gray-300 dark:border-gray-700">
@@ -39,9 +38,12 @@ export default function Sidebar() {
                 type='Groups'
                 items={items}
             />
-                
-            
+            <Collapse
+                type='Users'
+                items={items}
+            />
         </div>
     );
 }
 
+export default Sidebar;

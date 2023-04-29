@@ -1,41 +1,68 @@
-import React, {useState} from 'react';
-import viteLogo from "/vite.svg";
+import React, {useState, FC, Dispatch, SetStateAction} from 'react';
+import Modal from 'react-modal';
 
 interface Props {
+    type: string;
     name: string;
-    id: string;
-    status: string;
+    isFriend: boolean;
     pictureUrl: string;
-    setIsOpen: (isOpen: boolean) => void;
+    isOpen: boolean;
+    closeModal: () => void;
 }
 
-export default function ProfileModal(prop: Props) {
+const modalStyles = {
+    content: {
+        top: '50%',
+        left: '50%',
+        right: 'auto',
+        bottom: 'auto',
+        transform: 'translate(-50%, -50%)',
+        borderRadius: '10px',
+        margin: '0',
+        padding: '0',
+        width: '250px',
+    }
+}
+
+const ProfileModal: FC<Props> = ({type, name, isFriend, pictureUrl, isOpen, closeModal}) => {
+    const chatOrAddFriendHandler = () => {
+        if(isFriend) {
+            console.log("add friend")
+        } else {
+            console.log("chat")
+        }
+    }
 
     return(
-        <div className="bg-white shadow-lg rounded-lg overflow-hidden flex-col">
-            <img
-                className="w-full h-50 object-cover object-center"
-                src={viteLogo}
-                alt="avatar"
-            />
-            <div className="p-4 flex font-11 test-left">
-                <h2 className="font-bold text-2m mb-2">Bozo Tarmarn</h2>
+        <Modal
+            isOpen={isOpen}
+            style={modalStyles}
+            onRequestClose={closeModal}
+        >
+            <div className="flex flex-col items-center">
+                <img
+                    className="w-40 h-40 rounded-2xl"
+                    src={pictureUrl}
+                    alt="Profile image"
+                />
+                <p className="font-bold my-2">
+                    {name}
+                </p>
             </div>
-            {(status != 'friend')&& (
-                <button className="bg-blue-500 text-white py-2 px-4 rounded-md w-full">
-                Add Friend
-                </button>
-            )}
-            {(status === 'friend')&& (
-                <button className="bg-blue-500 text-white py-2 px-4 rounded-md w-full">
-                Chat
-                </button>
-            )}
-            
-            <button className="bg-blue-500 text-white py-2 px-4 rounded-md w-full"
-            onClick={()=>prop.setIsOpen(false)}>
+            <button 
+                className="w-full p-3 text-cyan-600 hover:bg-gray-200"
+                onClick={chatOrAddFriendHandler}
+                >
+                {isFriend ? 'Chat' : (type === 'Users' ? 'Add Friend' : 'Join Group')}
+            </button>
+            <button 
+                className="w-full p-3 text-cyan-600 hover:bg-gray-200"
+                onClick={closeModal}
+                >
                 Cancel
             </button>
-        </div>
+        </Modal>
     )
 }
+
+export default ProfileModal;

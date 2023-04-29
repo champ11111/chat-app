@@ -5,6 +5,7 @@ import ProfileCard from './ProfileCard';
 interface Item {
     imageUrl: string;
     nickname: string;
+    isFriend: boolean;
 }
 
 interface Props {
@@ -36,17 +37,17 @@ const Collapse: FC<Props> = ({ type, items }) => {
                     />
                 )}
             </div>
-            {collapsed ? (
-                <div className='flex flex-col'>
-                    {items.map((item) => (
-                        <ProfileCard
-                            key={item.nickname}
-                            imageUrl={item.imageUrl}
-                            nickname={item.nickname}
-                        />
-                    ))}
-        </div>
-            ) : <></>}
+            <div className={`flex flex-col ${collapsed ? "":"hidden"}`}>
+                {items.map((item, idx) => (
+                    <ProfileCard
+                        key={idx}
+                        type={type}
+                        imageUrl={item.imageUrl}
+                        nickname={item.nickname}
+                        isFriend={item.isFriend}
+                    />
+                ))}
+            </div>
         </div>
     )
 }
