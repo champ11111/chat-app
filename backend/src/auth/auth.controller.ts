@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Post,
+  Req,
   Res,
   UploadedFile,
   UseInterceptors,
@@ -22,7 +23,7 @@ export class AuthController {
   async register(
     @Body() dto: Omit<User, 'id'>,
     @UploadedFile() file: Express.Multer.File,
-    @Res() res: Response,
+    @Res({ passthrough: true }) res: Response,
   ) {
     try {
       const { accessToken } = await this.service.register(dto, file);
@@ -35,7 +36,10 @@ export class AuthController {
 
   //Login a user
   @Post('login')
-  async login(@Body() dto: Omit<User, 'id'>, @Res() res: Response) {
+  async login(
+    @Body() dto: Omit<User, 'id'>,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     try {
       const { accessToken } = await this.service.login(dto);
       res.cookie('accessToken', accessToken, { httpOnly: true });
