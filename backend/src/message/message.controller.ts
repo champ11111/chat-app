@@ -6,15 +6,10 @@ import {
   Param,
   ParseIntPipe,
   Post,
-  Req,
 } from '@nestjs/common';
 import { MessageService } from './message.service';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { Message } from 'src/entities';
-
-interface CustomRequest extends Request {
-  uid?: number;
-}
 
 @Controller('messages')
 export class MessageController {
@@ -34,11 +29,7 @@ export class MessageController {
 
   //Create a new message
   @Post('')
-  create(
-    @Body() dto: CreateMessageDto,
-    @Req() req: CustomRequest,
-  ): Promise<Message> {
-    dto.senderId = req.uid;
+  create(@Body() dto: CreateMessageDto): Promise<Message> {
     return this.service.createMessage(dto);
   }
 

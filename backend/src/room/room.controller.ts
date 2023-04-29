@@ -6,13 +6,10 @@ import {
   Param,
   ParseIntPipe,
   Post,
-  UploadedFile,
-  UseInterceptors,
 } from '@nestjs/common';
 import { RoomService } from './room.service';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { Room } from 'src/entities';
-import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('rooms')
 export class RoomController {
@@ -31,13 +28,8 @@ export class RoomController {
 
   //Create a new room
   @Post('')
-  @UseInterceptors(FileInterceptor('groupPicture'))
-  create(
-    @Body() dto: CreateRoomDto,
-    @UploadedFile() file: Express.Multer.File,
-  ): Promise<Room> {
-    console.log('dto', dto);
-    return this.roomService.createRoom(dto, file);
+  create(@Body() dto: CreateRoomDto): Promise<Room> {
+    return this.roomService.createRoom(dto);
   }
 
   //Add a user to a room

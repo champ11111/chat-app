@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
+import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 
@@ -41,9 +41,6 @@ import { ImageModule } from './image/image.module';
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(LoggerMiddleware).forRoutes('*');
-    consumer
-      .apply(AuthMiddleware)
-      .exclude({ path: 'api/auth/(.*)', method: RequestMethod.ALL })
-      .forRoutes('*');
+    // consumer.apply(AuthMiddleware).forRoutes('*');
   }
 }

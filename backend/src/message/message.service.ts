@@ -39,10 +39,6 @@ export class MessageService {
       throw new Error('Room not found');
     }
 
-    if (!dto.senderId) {
-      throw new Error('Sender not found');
-    }
-
     //check if sender exists
     const sender = await this.userRepo.findOne({ where: { id: dto.senderId } });
     if (!sender) {

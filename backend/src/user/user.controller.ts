@@ -6,14 +6,11 @@ import {
   Param,
   ParseIntPipe,
   Put,
-  UploadedFile,
-  UseInterceptors,
 } from '@nestjs/common';
 
 import { User } from 'src/entities';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('users')
 export class UserController {
@@ -59,13 +56,11 @@ export class UserController {
 
   //Update a user
   @Put(':id')
-  @UseInterceptors(FileInterceptor('profilePicture'))
   update(
     @Param('id', new ParseIntPipe()) id: number,
     @Body() dto: CreateUserDto,
-    @UploadedFile() file: Express.Multer.File,
   ): Promise<User> {
-    return this.service.update(id, dto, file);
+    return this.service.update(id, dto);
   }
 
   //Delete a user
