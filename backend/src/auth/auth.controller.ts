@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   Post,
   Res,
@@ -28,19 +29,21 @@ export class AuthController {
     try {
       const { accessToken } = await this.service.register(dto, file);
       res.cookie('accessToken', accessToken, { httpOnly: true });
-      console.log('accessToken: ', accessToken);
-      return { accessToken };
+      res.status(200).json({ accessToken });
     } catch (err) {
-      console.log(err);
+      res.status(400).json({ message: err.message });
     }
   }
 
   //Login a user
   @Post('login')
   async login(@Body() dto: Omit<User, 'id'>, @Res() res: Response) {
-    const { accessToken } = await this.service.login(dto);
-    res.cookie('accessToken', accessToken, { httpOnly: true });
-    console.log('accessToken: ', accessToken);
-    return { accessToken };
+    try {
+      const { accessToken } = await this.service.login(dto);
+      res.cookie('accessToken', accessToken, { httpOnly: true });
+      res.status(200).json({ accessToken });
+    } catch (err) {
+      res.status(400).json({ message: err.message });
+    }
   }
 }
