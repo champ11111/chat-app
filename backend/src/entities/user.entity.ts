@@ -6,6 +6,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+
 import { UserRoomRelation } from './user-room-relation.entity';
 import { Message } from './message.entity';
 import { ReaderMessageRelation } from './reader-message-relation.entity';
@@ -24,7 +25,9 @@ export class User {
   @Column()
   password: string;
 
-  @Column({ nullable: true })
+  @Column({
+    default: 'https://chapabc.s3.us-west-1.amazonaws.com/defaultProfile.jpeg',
+  })
   profilePictureUrl: string;
 
   @CreateDateColumn()

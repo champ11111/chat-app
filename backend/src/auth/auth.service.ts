@@ -18,10 +18,16 @@ export class AuthService {
     dto: Omit<User, 'id'>,
     file: Express.Multer.File,
   ): Promise<{ accessToken: string }> {
-    console.log('dto: ', dto);
-    console.log('file: ', file);
-    const profilePictureUrl = await this.imageService.uploadImageToS3(file);
-    dto.profilePictureUrl = profilePictureUrl;
+    if (file) {
+      const profilePictureUrl = await this.imageService.uploadImageToS3(file);
+      dto.profilePictureUrl = profilePictureUrl;
+    }
+
+    //Check if email is already in use
+    const userWithEmail = await this.userService.findOneByEmail(dto.email);
+    if (userWithEmail) {
+      throw new BadRequestException('Email is already in use');
+    }
     const user = await this.userService.create(dto);
     const accessToken = await this.getTokenForUser(user.id);
     return {
