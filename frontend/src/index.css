@@ -36,3 +36,16 @@
     background-color: #f9f9f9;
   }
 }
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color: #ffffff;
+    background-color: #484848;
+  }
+  a:hover {
+    color: #03dac5;
+  }
+  button {
+    background-color: #821515;
+  }
+}
