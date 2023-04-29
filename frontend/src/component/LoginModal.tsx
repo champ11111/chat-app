@@ -1,12 +1,16 @@
 import React, { useState } from "react";
 import logo from "../assets/logo.jpg";
+import { login } from "../api/auth";
 
-export default function LoginCard() : JSX.Element {
-  const [username, setUsername] = useState("");
+export default function LoginModal() : JSX.Element {
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = () => {
+  const handleLogin = async (e: React.MouseEvent<HTMLButtonElement>) => {
     // TODO: Implement login logic
+    e.preventDefault();
+    const res = await login({email, password});
+    console.log(res);
   };
 
   return (
@@ -16,15 +20,15 @@ export default function LoginCard() : JSX.Element {
         <h1 className = "text-black">Login</h1>
         <img src={logo} className="w-full" alt="logo" />
           <div className="mb-4">
-            <label className="block text-gray-700 font-bold mb-2 text-left" htmlFor="username">
+            <label className="block text-gray-700 font-bold mb-2 text-left" htmlFor="email">
               Email
             </label>
             <input
               className="border rounded-lg py-2 px-3 w-full"
               type="text"
-              id="username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              id="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
           </div>
           <div className="mb-4">

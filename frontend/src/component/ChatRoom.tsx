@@ -7,7 +7,7 @@ type Message = {
   timestamp: string;
 };
 
-export default function Chatroom() {
+export default function ChatRoom() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
 

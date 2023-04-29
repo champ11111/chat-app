@@ -1,9 +1,9 @@
 import React, {ReactNode, useState, useRef, useEffect} from "react";
 import logo from "../assets/logo.jpg";
-import LoginCard from "../component/login";
-import RegisterCard from "../component/register";
+import LoginModal from "../component/LoginModal";
+import RegisterModal from "../component/RegisterModal";
 
-export default function LandingPage(){
+export default function Home(){
 
     const [isLogin, setIsLogin] = useState(false);
     const [isRegister, setIsRegister] = useState(false);
@@ -47,7 +47,7 @@ export default function LandingPage(){
                             <div 
                             className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-6 z-20" 
                             ref = {overlayRef}>
-                                <LoginCard/>
+                                <LoginModal/>
                             </div>
                         )}
                     <div className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-center cursor-pointer"
@@ -59,7 +59,7 @@ export default function LandingPage(){
                             <div 
                             className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-6 z-20" 
                             ref = {overlayRef}>
-                                <RegisterCard/>
+                                <RegisterModal/>
                             </div>
                         )}
                 </div>

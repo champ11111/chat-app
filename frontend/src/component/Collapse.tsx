@@ -1,6 +1,6 @@
 import { FC, Dispatch, SetStateAction, useState } from 'react'
 import { CaretDownOutlined, CaretRightOutlined } from '@ant-design/icons'
-import ProfileCard from './profile-card';
+import ProfileCard from './ProfileCard';
 
 interface Item {
     imageUrl: string;

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const RegisterCard: React.FC = () => {
+const RegisterModal: React.FC = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -62,4 +62,4 @@ const RegisterCard: React.FC = () => {
   );
 };
 
-export default RegisterCard;
+export default RegisterModal;

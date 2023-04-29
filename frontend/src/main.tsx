@@ -3,14 +3,14 @@ import ReactDOM from "react-dom/client";
 import "./index.css"
 import { createBrowserRouter,RouterProvider } from "react-router-dom";
 
-import LandingPage from "./page/landing-page";
-import ErrorPage from "./page/error-page"
-import ChatPage from "./page/chat-page";
+import Home from "./page/Home";
+import ErrorPage from "./page/Error"
+import ChatPage from "./page/Chat";
 
 const router = createBrowserRouter([
     {
         path: "/",
-        element: <LandingPage />,
+        element: <Home />,
         errorElement: <ErrorPage />,
     },
     {

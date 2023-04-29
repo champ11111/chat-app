@@ -1,9 +1,9 @@
 import {useState, useEffect} from 'react';
-import Sidebar from '../component/sidebar';
-import ProfileOverlay from '../component/profile-overlay';
-import Chatroom from '../component/chat-room';
+import Sidebar from '../component/Sidebar';
+import ProfileOverlay from '../component/ProfileModal';
+import Chatroom from '../component/ChatRoom';
 
-export default function ChatPage(){
+export default function Chat(){
     return (
         <div id="chat-page" className= "flex w">
             <Sidebar/>

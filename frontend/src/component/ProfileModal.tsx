@@ -9,7 +9,7 @@ interface Props {
     setIsOpen: (isOpen: boolean) => void;
 }
 
-export default function ProfileOverlay(prop: Props) {
+export default function ProfileModal(prop: Props) {
 
     return(
         <div className="bg-white shadow-lg rounded-lg overflow-hidden flex-col">
