@@ -7,9 +7,13 @@ export class ReaderMessageRelation {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => User, (user) => user.readerMessageRelations)
+  @ManyToOne(
+    () => User, (user) => user.readerMessageRelations,
+    {onDelete: 'CASCADE'})
   reader: User;
 
-  @ManyToOne(() => Message, (message) => message.readerMessageRelations)
+  @ManyToOne(
+    () => Message, (message) => message.readerMessageRelations,
+    {onDelete: 'CASCADE'})
   message: Message;
 }
