@@ -3,6 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { compare } from 'bcrypt';
 
 import { User } from 'src/entities';
+import { ImageService } from 'src/image/image.service';
 import { UserService } from 'src/user/user.service';
 
 @Injectable()
@@ -10,17 +11,28 @@ export class AuthService {
   constructor(
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
+    private readonly imageService: ImageService,
   ) {}
 
-  async register(dto: Omit<User, 'id'>) {
+  async register(
+    dto: Omit<User, 'id'>,
+    file: Express.Multer.File,
+  ): Promise<{ accessToken: string }> {
+    console.log('dto: ', dto);
+    console.log('file: ', file);
+    const profilePictureUrl = await this.imageService.uploadImageToS3(file);
+    dto.profilePictureUrl = profilePictureUrl;
     const user = await this.userService.create(dto);
-    const accessToken = this.getTokenForUser(user.id);
+    const accessToken = await this.getTokenForUser(user.id);
     return {
       accessToken: accessToken,
     };
   }
 
-  async login({ email, password }: Omit<User, 'id'>) {
+  async login({
+    email,
+    password,
+  }: Omit<User, 'id'>): Promise<{ accessToken: string }> {
     const user = await this.userService.findOneByEmail(email);
     if (!user) {
       throw new BadRequestException('Invalid username/password');
@@ -32,18 +44,18 @@ export class AuthService {
       throw new BadRequestException('Invalid username/password');
     }
 
-    const accessToken = this.getTokenForUser(user.id);
+    const accessToken = await this.getTokenForUser(user.id);
     return {
       accessToken: accessToken,
     };
   }
 
-  verifyToken(token: string): { uid: number } {
-    const res = this.jwtService.verify<{ uid: number }>(token);
+  async verifyToken(token: string): Promise<{ uid: number }> {
+    const res = await this.jwtService.verify<{ uid: number }>(token);
     return res;
   }
 
-  getTokenForUser(uid: number): string {
+  async getTokenForUser(uid: number): Promise<string> {
     const payload = { uid };
     return this.jwtService.sign(payload);
   }

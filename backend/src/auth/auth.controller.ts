@@ -1,8 +1,17 @@
-import { Body, Controller, Post, Res } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  HttpCode,
+  Post,
+  Res,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common';
 import { Response } from 'express';
 
 import { User } from 'src/entities';
 import { AuthService } from './auth.service';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('auth')
 export class AuthController {
@@ -10,10 +19,20 @@ export class AuthController {
 
   //Create a new user
   @Post('register')
-  async register(@Body() dto: Omit<User, 'id'>, @Res() res: Response) {
-    const { accessToken } = await this.service.register(dto);
-    res.cookie('accessToken', accessToken, { httpOnly: true });
-    return { accessToken };
+  @UseInterceptors(FileInterceptor('profilePicture'))
+  async register(
+    @Body() dto: Omit<User, 'id'>,
+    @UploadedFile() file: Express.Multer.File,
+    @Res() res: Response,
+  ) {
+    try {
+      const { accessToken } = await this.service.register(dto, file);
+      res.cookie('accessToken', accessToken, { httpOnly: true });
+      console.log('accessToken: ', accessToken);
+      return { accessToken };
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   //Login a user
@@ -21,6 +40,7 @@ export class AuthController {
   async login(@Body() dto: Omit<User, 'id'>, @Res() res: Response) {
     const { accessToken } = await this.service.login(dto);
     res.cookie('accessToken', accessToken, { httpOnly: true });
+    console.log('accessToken: ', accessToken);
     return { accessToken };
   }
 }

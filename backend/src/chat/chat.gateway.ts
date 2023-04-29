@@ -27,7 +27,6 @@ export class ChatGateway
 
   afterInit(server: Server) {
     this.logger.log('Init');
-    console.log(server);
   }
 
   handleDisconnect(client: Socket) {

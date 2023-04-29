@@ -10,15 +10,16 @@ interface CustomRequest extends Request {
 export class AuthMiddleware implements NestMiddleware {
   constructor(private readonly authService: AuthService) {}
 
-  use(req: CustomRequest, _: Response, next: () => void) {
+  async use(req: CustomRequest, _: Response, next: () => void) {
     const token = (req.headers.authorization ?? '').split('Bearer ')[1];
     try {
-      // const { uid } = this.authService.verifyToken(token);
+      const { uid } = await this.authService.verifyToken(token);
       //TODO: uncomment this line to enable authentication
-      const uid = 1;
-      // if (uid) {
-      req.uid = uid;
-      // }
+      if (uid) {
+        req.uid = uid;
+      } else {
+        req.uid = 1;
+      }
     } catch (err) {
       req.uid = undefined;
       console.log(err);

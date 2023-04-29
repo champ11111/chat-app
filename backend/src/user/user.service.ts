@@ -19,7 +19,10 @@ export class UserService {
 
   //Find user by id
   async findOneById(id: number): Promise<User> {
-    return this.repo.findOne({ where: { id } });
+    return this.repo.findOne({
+      where: { id },
+      relations: ['userRoomRelations', 'userRoomRelations.room'],
+    });
   }
 
   //Find user by email

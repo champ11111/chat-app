@@ -20,7 +20,7 @@ export class Room {
   @Column({ default: false })
   isGroupChat: boolean;
 
-  @Column()
+  @Column({ nullable: true })
   lastMessage: string;
 
   @Column({ nullable: true })

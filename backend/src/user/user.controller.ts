@@ -1,17 +1,19 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
   Post,
+  Put,
 } from '@nestjs/common';
 
 import { User } from 'src/entities';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 
-@Controller('user')
+@Controller('users')
 export class UserController {
   constructor(private readonly service: UserService) {}
 
@@ -54,7 +56,7 @@ export class UserController {
   // }
 
   //Update a user
-  @Post(':id')
+  @Put(':id')
   update(
     @Param('id', new ParseIntPipe()) id: number,
     @Body() dto: CreateUserDto,
@@ -63,7 +65,7 @@ export class UserController {
   }
 
   //Delete a user
-  @Post(':id')
+  @Delete(':id')
   delete(@Param('id', new ParseIntPipe()) id: number): Promise<User> {
     return this.service.delete(id);
   }
