@@ -15,6 +15,7 @@ export default function Chat(){
     useEffect(() => {
         const fetchUsers = async () => {
             const res = await getUsers();
+            // console.log(res)
             setUsers(()=>res.data.filter((user: User) => user.id !== uid));
             setMyProfile(()=>res.data.filter((user: User) => user.id === uid)[0]);
         }
@@ -25,15 +26,33 @@ export default function Chat(){
         }
         fetchRooms();
     }, [])
-    console.log("users", users)
-    console.log("myProfile", myProfile)
-    console.log("rooms", rooms)
+    // console.log("users", users)
+    // console.log("myProfile", myProfile)
+    // console.log("rooms", rooms)
 
+    // "profilePictureURL" : user.profilePictureUrl,
+    // "nickname" : user.username,
+    // "isFriend" : true
     return (
         <div id="chat-page" className= "flex w">
             <Sidebar 
-                myProfile={myProfile}
-                items={users}
+                myProfile = {{
+                    "profilePictureURL" : myProfile.profilePictureUrl,
+                    "nickname" : myProfile.username
+                }}
+                users = {users.map((user: User) => ({
+                    "profilePictureURL" : user.profilePictureUrl,
+                    "nickname" : user.username,
+                    "isFriend" : true
+                }))}
+
+                groups = {rooms.filter((room: Room) => room.isGroupChat).map((room: Room) => ({
+                    "profilePictureURL": room.groupPictureUrl,
+                    "nickname": room.name,
+                    "isJoined": room.userRoomRelations.some((userRoomRelation) => userRoomRelation.user.id === uid)
+                }))}
+                
+
             />
             <div id = "main" className = "w-3/4">
                 <Chatroom/>

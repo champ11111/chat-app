@@ -5,10 +5,11 @@ interface Props {
   type: string;
   imageUrl: string;
   nickname: string;
-  isFriend: boolean;
+  isFriend?: boolean;
+  isJoined?: boolean;
 }
 
-const ProfileCard: FC<Props> = ({ type, imageUrl, nickname, isFriend }) => {
+const ProfileCard: FC<Props> = ({ type, imageUrl, nickname, isFriend ,isJoined}) => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
 
   return (
@@ -17,6 +18,7 @@ const ProfileCard: FC<Props> = ({ type, imageUrl, nickname, isFriend }) => {
         type={type}
         name={nickname}
         isFriend={isFriend}
+        isJoined={isJoined}
         pictureUrl={imageUrl}
         isOpen={isModalOpen}
         closeModal={() => setIsModalOpen(false)}
