@@ -31,3 +31,10 @@ export const addUserToRoom = (roomId: number, userId: number) => {
         userId
     })
 }
+
+export const removeUserFromRoom = (roomId: number, userId: number) => {
+    return api.post("/rooms/removeUser", {
+        roomId,
+        userId
+    })
+}
