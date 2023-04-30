@@ -31,7 +31,7 @@ export default function ChatRoom() {
 
 
   return (
-    <div className="h-screen flex flex-col">
+    <div className="min-h-full flex flex-col justify-between">
       <div className="bg-gray-800 py-2 px-4 text-gray-200 flex items-center justify-between">
         <h1 className="text-lg font-bold">Chatroom</h1>
         <div className="flex items-center space-x-4">

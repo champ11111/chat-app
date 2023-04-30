@@ -40,7 +40,7 @@ export default function Chat(){
     // "nickname" : user.username,
     // "isFriend" : true
     return (
-        <div id="chat-page" className= "flex w">
+        <div id="chat-page" className= "flex w-full min-h-screen">
             <Sidebar 
                 myProfile = {{
                     "profilePictureURL" : myProfile.profilePictureUrl,
