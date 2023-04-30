@@ -7,11 +7,11 @@ import { PlusSquareFilled } from '@ant-design/icons';
 
 interface Props {
     myProfile: {
-        imageUrl: string;
+        profilePictureURL: string;
         nickname: string;
     };
     items: {
-        imageUrl: string;
+        profilePictureURL: string;
         nickname: string;
         isFriend: boolean;
     }[];
@@ -37,7 +37,7 @@ const Sidebar: FC<Props> = ({myProfile, items}) => {
                 />
             </div>
             <MyProfileCard
-                imageUrl={myProfile.imageUrl}
+                profilePictureURL={myProfile.profilePictureURL}
                 nickname={myProfile.nickname}
             />
             <Collapse
