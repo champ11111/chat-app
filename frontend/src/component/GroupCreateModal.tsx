@@ -43,7 +43,7 @@ const GroupCreateModal: FC<Props> = ({ isOpen, closeModal, users }) => {
             reader.readAsDataURL(file)
             reader.onloadend = () => {
                 setGroupPicture(reader.result as string)
-                console.log("reader.result :", reader.result)
+                // console.log("reader.result :", reader.result)
             }
         }
     }
@@ -57,7 +57,7 @@ const GroupCreateModal: FC<Props> = ({ isOpen, closeModal, users }) => {
         }
         const createRoomHandler = async () => {
             const response = await createRoom(formData)
-            console.log("response :", response)
+            // console.log("response :", response)
         }
         createRoomHandler()
         setGroupName('')
@@ -66,7 +66,6 @@ const GroupCreateModal: FC<Props> = ({ isOpen, closeModal, users }) => {
         closeModal()
     }
 
-    console.log(groupMembers)
 
     return (
         <Modal

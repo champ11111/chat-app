@@ -1,10 +1,11 @@
-import React, { useState, useEffect, FC, Dispatch, SetStateAction } from 'react';
+import React, { useState, useEffect, FC, Dispatch, SetStateAction, useContext } from 'react';
 import Modal from 'react-modal';
 import { createRoom, addUserToRoom, getRooms, getRoomById } from '../api/room';
 import { getUserByID } from '../api/user';
 import { getUID } from '../utils/jwtGet';
 import User from '../types/user';
 import { Room } from '../types/room';
+import { ChatIdContext } from '../page/Chat';
 
 interface Props {
     type: string;
@@ -61,10 +62,12 @@ const ProfileModal: FC<Props> = ({ type, name, isFriend, isJoined, pictureUrl, i
         setIsDarkMode(localStorage.getItem("darkMode") === "true")
     }, [localStorage.getItem("darkMode")])
 
+    const {chatId,setChatId} = useContext(ChatIdContext);
+
     const chatOrAddFriendHandler = () => {
         if (isFriendState || isJoinedState) {
             // chat
-            closeModal();
+            setChatId(id);
         } else {
             // add friend
             if (type === 'Users') {
