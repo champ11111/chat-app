@@ -1,41 +1,74 @@
-import React, {useState} from 'react';
-import viteLogo from "/vite.svg";
+import React, { useState, useEffect, FC, Dispatch, SetStateAction } from 'react';
+import Modal from 'react-modal';
 
 interface Props {
+    type: string;
     name: string;
-    id: string;
-    status: string;
+    isFriend: boolean;
     pictureUrl: string;
-    setIsOpen: (isOpen: boolean) => void;
+    isOpen: boolean;
+    closeModal: () => void;
 }
 
-export default function ProfileModal(prop: Props) {
+const modalStyles = {
+    content: {
+        top: '50%',
+        left: '50%',
+        right: 'auto',
+        bottom: 'auto',
+        transform: 'translate(-50%, -50%)',
+        borderRadius: '12px',
+        margin: '0',
+        padding: '0',
+    }
+}
 
-    return(
-        <div className="bg-white shadow-lg rounded-lg overflow-hidden flex-col">
-            <img
-                className="w-full h-50 object-cover object-center"
-                src={viteLogo}
-                alt="avatar"
-            />
-            <div className="p-4 flex font-11 test-left">
-                <h2 className="font-bold text-2m mb-2">Bozo Tarmarn</h2>
+const ProfileModal: FC<Props> = ({ type, name, isFriend, pictureUrl, isOpen, closeModal }) => {
+    const [isDarkMode, setIsDarkMode] = useState<boolean>(localStorage.getItem("darkMode") === "true")
+    useEffect(() => {
+        setIsDarkMode(localStorage.getItem("darkMode") === "true")
+    }, [localStorage.getItem("darkMode")])
+
+    const chatOrAddFriendHandler = () => {
+        if (isFriend) {
+            console.log("add friend")
+        } else {
+            console.log("chat")
+        }
+    }
+
+    return (
+        <Modal
+            isOpen={isOpen}
+            style={modalStyles}
+            onRequestClose={closeModal}
+        >
+            <div className={`${isDarkMode ? 'dark' : ''}`}>
+                <div className="flex flex-col items-center dark:bg-gray-800">
+                    <img
+                        className="w-56 h-56 rounded-xl object-cover"
+                        src={pictureUrl}
+                        alt="Profile image"
+                    />
+                    <p className="font-bold my-2 dark:text-white">
+                        {name}
+                    </p>
+                </div>
+                <button
+                    className="w-full p-3 text-cyan-600 hover:bg-gray-200 dark:text-white dark:bg-gray-800 dark:hover:bg-gray-200 dark:hover:text-cyan-600"
+                    onClick={chatOrAddFriendHandler}
+                >
+                    {isFriend ? 'Chat' : (type === 'Users' ? 'Add Friend' : 'Join Group')}
+                </button>
+                <button
+                    className="w-full p-3 text-cyan-600 hover:bg-gray-200 dark:text-white dark:bg-gray-800 dark:hover:bg-gray-200 dark:hover:text-cyan-600"
+                    onClick={closeModal}
+                >
+                    Cancel
+                </button>
             </div>
-            {(status != 'friend')&& (
-                <button className="bg-blue-500 text-white py-2 px-4 rounded-md w-full">
-                Add Friend
-                </button>
-            )}
-            {(status === 'friend')&& (
-                <button className="bg-blue-500 text-white py-2 px-4 rounded-md w-full">
-                Chat
-                </button>
-            )}
-            
-            <button className="bg-blue-500 text-white py-2 px-4 rounded-md w-full"
-            onClick={()=>prop.setIsOpen(false)}>
-                Cancel
-            </button>
-        </div>
+        </Modal>
     )
 }
+
+export default ProfileModal;

@@ -1,26 +1,13 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css"
-import { createBrowserRouter,RouterProvider } from "react-router-dom";
+import App from "./App";
+import Modal from "react-modal"
 
-import Home from "./page/Home";
-import ErrorPage from "./page/Error"
-import ChatPage from "./page/Chat";
-
-const router = createBrowserRouter([
-    {
-        path: "/",
-        element: <Home />,
-        errorElement: <ErrorPage />,
-    },
-    {
-        path: "/main",
-        element: <ChatPage />,
-    }
-]);
+Modal.setAppElement("#root")
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
     <React.StrictMode>
-      <RouterProvider router={router} />
+        <App />
     </React.StrictMode>
-  );
+);
