@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { 
+  Injectable,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -39,7 +43,7 @@ export class RoomService {
       for (const userId of dto.userIds) {
         const user = await this.userRepo.findOne({ where: { id: userId } });
         if (!user) {
-          throw new Error('User not found');
+          throw new NotFoundException('User not found');
         }
         const userRoomRelation = new UserRoomRelation();
         userRoomRelation.user = user;
@@ -61,7 +65,7 @@ export class RoomService {
     for (const userId of userIds) {
       const user = await this.userRepo.findOne({ where: { id: userId } });
       if (!user) {
-        throw new Error('User not found');
+        throw new NotFoundException('User not found');
       }
       const userRoomRelation = new UserRoomRelation();
       userRoomRelation.user = user;
@@ -76,7 +80,11 @@ export class RoomService {
     });
 
     if (!room) {
-      throw new Error('Room not found');
+      throw new NotFoundException('Room not found');
+    }
+
+    if (!room.isGroupChat) {
+      throw new ConflictException('Room is not a group chat');
     }
 
     const user = await this.userRepo.findOne({
@@ -84,7 +92,7 @@ export class RoomService {
     });
 
     if (!user) {
-      throw new Error('User not found');
+      throw new NotFoundException('User not found');
     }
 
     //check if user is already in room
@@ -93,7 +101,7 @@ export class RoomService {
     });
 
     if (userRoomRelationExists) {
-      throw new Error('User is already in room');
+      throw new ConflictException('User is already in room');
     }
 
     const userRoomRelation = new UserRoomRelation();
@@ -113,7 +121,11 @@ export class RoomService {
     });
 
     if (!room) {
-      throw new Error('Room not found');
+      throw new NotFoundException('Room not found');
+    }
+
+    if (!room.isGroupChat) {
+      throw new ConflictException('Room is not a group chat');
     }
 
     const user = await this.userRepo.findOne({
@@ -121,7 +133,7 @@ export class RoomService {
     });
 
     if (!user) {
-      throw new Error('User not found');
+      throw new NotFoundException('User not found');
     }
 
     const userRoomRelation = await this.userRoomRelationRepo.findOne({
@@ -129,7 +141,7 @@ export class RoomService {
     });
 
     if (!userRoomRelation) {
-      throw new Error('User not found in this room');
+      throw new NotFoundException('User not found in this room');
     }
 
     await this.userRoomRelationRepo.delete({ id: userRoomRelation.id });
@@ -149,7 +161,7 @@ export class RoomService {
       where: { id },
     });
     if (!room) {
-      throw new Error('Room not found');
+      throw new NotFoundException('Room not found');
     }
 
     await this.repo.remove(room);

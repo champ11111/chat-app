@@ -6,6 +6,9 @@ import {
   Param,
   ParseIntPipe,
   Put,
+  NotFoundException,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 
 import { User } from 'src/entities';
@@ -18,26 +21,42 @@ export class UserController {
 
   //Find all users
   @Get()
-  findAll(): Promise<User[]> {
-    return this.service.findAll();
+  async findAll(): Promise<User[]> {
+    const users = await this.service.findAll();
+    if(users.length === 0){
+      throw new NotFoundException('Users not found');
+    }
+    return users;
   }
 
   //Find user by id
   @Get(':id')
-  findById(@Param('id', new ParseIntPipe()) id: number): Promise<User> {
-    return this.service.findOneById(id);
+  async findById(@Param('id', new ParseIntPipe()) id: number): Promise<User> {
+    const user = await this.service.findOneById(id);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return user;
   }
 
   //Find user by email
   @Get('email/:email')
   findByEmail(@Param('email') email: string): Promise<User> {
-    return this.service.findOneByEmail(email);
+    const user = this.service.findOneByEmail(email);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return user;
   }
 
   //Find user by username
   @Get('username/:username')
   findByUsername(@Param('username') username: string): Promise<User> {
-    return this.service.findOneByUsername(username);
+    const user = this.service.findOneByUsername(username);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return user;
   }
 
   //Create a new user
