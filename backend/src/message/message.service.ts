@@ -69,7 +69,7 @@ export class MessageService {
     //find message by id
     const message = await this.repo.findOne({
       where: { id: messageId },
-      relations: ['readerMessageRelations'],
+      relations: ['readerMessageRelations', 'readerMessageRelations.reader'],
     });
     if (!message) {
       throw new NotFoundException('Message not found');
@@ -79,6 +79,7 @@ export class MessageService {
     if (!user) {
       throw new NotFoundException('User not found');
     }
+    console.log(message.readerMessageRelations)
     //check if message has already been read by user
     const existingRelation = message.readerMessageRelations.find(
       (relation) => relation.reader.id === user.id,
@@ -95,8 +96,7 @@ export class MessageService {
 
     message.readerMessageRelations.push(relation);
 
-    await this.repo.save(message);
-    return message;
+    return this.repo.save(message);
   }
 
   async deleteMessage(messageId: number): Promise<Message> {
