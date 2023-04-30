@@ -1,3 +1,8 @@
+export interface UserRoomRelation {
+    id: number;
+    user: User;
+}
+
 interface User {
     id?: number;
     username: string;
@@ -6,7 +11,7 @@ interface User {
     profilePictureUrl: string;
     createdAt?: string;
     updatedAt?: string;
-    isFriend?: boolean;
+    userRoomRelations?: UserRoomRelation[];
 }
 
 export default User;

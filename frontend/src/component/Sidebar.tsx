@@ -9,24 +9,32 @@ interface Props {
     myProfile: {
         profilePictureURL: string;
         nickname: string;
+        id: number;
     };
-    items: {
+    users : {
         profilePictureURL: string;
         nickname: string;
-        isFriend: boolean;
+        id: number;
+        isFriend?: boolean;
+    }[];
+    groups: {
+        profilePictureURL: string;
+        nickname: string;
+        isJoined?: boolean;
+        id: number;
     }[];
 }
 
-const Sidebar: FC<Props> = ({myProfile, items}) => { 
+const Sidebar: FC<Props> = ({myProfile, users, groups}) => { 
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
-    
 
     return (<>
         <GroupCreateModal
             isOpen={isModalOpen}
             closeModal={() => setIsModalOpen(false)}
+            users={users}
         />
-        <div className="flex flex-col w-1/4 h-screen">
+        <div className="flex flex-col w-1/4">
             <div className="flex justify-between p-2 border-b border-gray-300 dark:border-gray-700">
                 <p className='text-xl font-bold text-gray-800 dark:text-gray-100'>
                     Chats
@@ -39,14 +47,15 @@ const Sidebar: FC<Props> = ({myProfile, items}) => {
             <MyProfileCard
                 profilePictureURL={myProfile.profilePictureURL}
                 nickname={myProfile.nickname}
+                id={myProfile.id}
             />
             <Collapse
                 type='Groups'
-                items={items}
+                groups={groups}
             />
             <Collapse
                 type='Users'
-                items={items}
+                users={users}
             />
         </div>
         </>
