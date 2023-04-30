@@ -10,6 +10,10 @@ export const getUsers = () => {
     return api.get('/users')
 }
 
+export const getUserByID = (id: number) => {
+    return api.get(`/users/${id}`)
+}
+
 export const getUser = (uid : any) => {
     return api.get(`/users/${uid}`)
 }

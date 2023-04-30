@@ -2,22 +2,32 @@ import { FC, Dispatch, SetStateAction, useState } from 'react'
 import { CaretDownOutlined, CaretRightOutlined } from '@ant-design/icons'
 import ProfileCard from './ProfileCard';
 
-interface Item {
-    imageUrl: string;
+interface Users {
+    profilePictureURL: string;
     nickname: string;
-    isFriend: boolean;
-}
+    isFriend?: boolean;
+    id: number;
+}[];
+
+interface Groups {
+    profilePictureURL: string;
+    nickname: string;
+    isJoined?: boolean;
+    id: number;
+}[];
 
 interface Props {
     type: string;
-    items: Item[];
+    users?: Users;
+    groups?: Groups;
 }
 
-const Collapse: FC<Props> = ({ type, items }) => {
+const Collapse: FC<Props> = ({ type, users, groups }) => {
     const [collapsed, setCollapsed] = useState<boolean>(false)
     const collapseHandler = () => {
         setCollapsed((prev) => !prev)
     }
+    const items = users || groups
 
     return (
         <div className='flex flex-col'>
@@ -42,9 +52,11 @@ const Collapse: FC<Props> = ({ type, items }) => {
                     <ProfileCard
                         key={idx}
                         type={type}
-                        imageUrl={item.imageUrl}
+                        imageUrl={item.profilePictureURL}
                         nickname={item.nickname}
                         isFriend={item.isFriend}
+                        isJoined={item.isJoined}
+                        id={item.id}
                     />
                 ))}
             </div>

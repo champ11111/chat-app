@@ -5,6 +5,7 @@ import MyProfileModal from './MyProfileModal'
 interface Props {
     profilePictureURL: string;
     nickname: string;
+    id: number;
 }
 
 const MyProfileCard: FC<Props> = ({profilePictureURL, nickname}) => {
