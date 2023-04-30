@@ -1,5 +1,4 @@
-import { useState,useRef,FC } from "react";
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext,useRef,FC } from "react";
 import { useNavigate } from "react-router-dom";
 import { io, Socket } from "socket.io-client";
 import  Message  from "../types/message";
@@ -36,6 +35,7 @@ const ChatRoom: FC<ChatRoomProps> = ({sender}: ChatRoomProps) => {
       setNewMessage("");
     }
     sendMessage();
+    
   };
 
   const handleSignout = () => {
