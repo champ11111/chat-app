@@ -1,4 +1,4 @@
-import {useState, useEffect, createContext, useContext} from 'react';
+import {useState, useEffect, createContext, useContext,useRef} from 'react';
 import Sidebar from '../component/Sidebar';
 import Chatroom from '../component/ChatRoom';
 import { getUsers, getUserByID } from '../api/user';
@@ -77,6 +77,8 @@ export default function Chat(){
                 <div id = "main" className = "w-3/4">
                     <Chatroom
                     id = {chatId}
+                    sender = {uid}
+                    socket = {socket.current}
                     />
                 </div>
             </div>

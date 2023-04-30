@@ -6,12 +6,13 @@ import { getMessagesByRoomId, sendMessageToRoom } from "../api/message";
 import { ChatIdContext } from '../page/Chat';
 
 interface ChatRoomProps {
-  sender: number;
-  socket: Socket;
+  id: number;
+  sender: number | null;
+  socket: Socket | null;
   
 }
 
-const ChatRoom: FC<ChatRoomProps> = ({sender}: ChatRoomProps) => {
+const ChatRoom: FC<ChatRoomProps> = ({id,sender,socket}: ChatRoomProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
 
@@ -35,8 +36,22 @@ const ChatRoom: FC<ChatRoomProps> = ({sender}: ChatRoomProps) => {
       setNewMessage("");
     }
     sendMessage();
-    
+
+    socket.emit("sendMessage", {
+      sender: sender,
+      content: newMessage,
+      chatId: chatId,
+    });
   };
+
+
+  useEffect(() => {
+    if(socket){
+      socket.on("getMessage", (data) => {
+        setMessages((prevMessages) => [...prevMessages, data]);
+      });
+    }
+  }, []);
 
   const handleSignout = () => {
     localStorage.removeItem("token");
@@ -109,4 +124,6 @@ const ChatRoom: FC<ChatRoomProps> = ({sender}: ChatRoomProps) => {
     </div>
   );
 };
+
+export default ChatRoom;
 
