@@ -4,7 +4,8 @@ import Modal from 'react-modal';
 interface Props {
     type: string;
     name: string;
-    isFriend: boolean;
+    isFriend?: boolean;
+    isJoined?: boolean;
     pictureUrl: string;
     isOpen: boolean;
     closeModal: () => void;
@@ -23,7 +24,7 @@ const modalStyles = {
     }
 }
 
-const ProfileModal: FC<Props> = ({ type, name, isFriend, pictureUrl, isOpen, closeModal }) => {
+const ProfileModal: FC<Props> = ({ type, name, isFriend, isJoined, pictureUrl, isOpen, closeModal }) => {
     const [isDarkMode, setIsDarkMode] = useState<boolean>(localStorage.getItem("darkMode") === "true")
     useEffect(() => {
         setIsDarkMode(localStorage.getItem("darkMode") === "true")
@@ -32,11 +33,14 @@ const ProfileModal: FC<Props> = ({ type, name, isFriend, pictureUrl, isOpen, clo
     const chatOrAddFriendHandler = () => {
         if (isFriend) {
             console.log("add friend")
+        } else if (isJoined) {
+            console.log("Join group")
         } else {
-            console.log("chat")
+            console.log("Chat")
         }
     }
-
+    console.log("isFriend :", isFriend)
+    console.log("isJoined :", isJoined)
     return (
         <Modal
             isOpen={isOpen}
@@ -58,7 +62,7 @@ const ProfileModal: FC<Props> = ({ type, name, isFriend, pictureUrl, isOpen, clo
                     className="w-full p-3 text-cyan-600 hover:bg-gray-200 dark:text-white dark:bg-gray-800 dark:hover:bg-gray-200 dark:hover:text-cyan-600"
                     onClick={chatOrAddFriendHandler}
                 >
-                    {isFriend ? 'Chat' : (type === 'Users' ? 'Add Friend' : 'Join Group')}
+                    {isFriend || isJoined ? 'Chat' : (type === 'Users' ? 'Add Friend' : 'Join Group')}
                 </button>
                 <button
                     className="w-full p-3 text-cyan-600 hover:bg-gray-200 dark:text-white dark:bg-gray-800 dark:hover:bg-gray-200 dark:hover:text-cyan-600"
