@@ -1,4 +1,4 @@
-import React, {useState, FC, Dispatch, SetStateAction} from 'react';
+import React, { useState, useEffect, FC, Dispatch, SetStateAction } from 'react';
 import Modal from 'react-modal';
 
 interface Props {
@@ -17,50 +17,56 @@ const modalStyles = {
         right: 'auto',
         bottom: 'auto',
         transform: 'translate(-50%, -50%)',
-        borderRadius: '10px',
+        borderRadius: '12px',
         margin: '0',
         padding: '0',
-        width: '250px',
     }
 }
 
-const ProfileModal: FC<Props> = ({type, name, isFriend, pictureUrl, isOpen, closeModal}) => {
+const ProfileModal: FC<Props> = ({ type, name, isFriend, pictureUrl, isOpen, closeModal }) => {
+    const [isDarkMode, setIsDarkMode] = useState<boolean>(localStorage.getItem("darkMode") === "true")
+    useEffect(() => {
+        setIsDarkMode(localStorage.getItem("darkMode") === "true")
+    }, [localStorage.getItem("darkMode")])
+
     const chatOrAddFriendHandler = () => {
-        if(isFriend) {
+        if (isFriend) {
             console.log("add friend")
         } else {
             console.log("chat")
         }
     }
 
-    return(
+    return (
         <Modal
             isOpen={isOpen}
             style={modalStyles}
             onRequestClose={closeModal}
         >
-            <div className="flex flex-col items-center">
-                <img
-                    className="w-40 h-40 rounded-2xl"
-                    src={pictureUrl}
-                    alt="Profile image"
-                />
-                <p className="font-bold my-2">
-                    {name}
-                </p>
+            <div className={`${isDarkMode ? 'dark' : ''}`}>
+                <div className="flex flex-col items-center dark:bg-gray-800">
+                    <img
+                        className="w-56 h-56 rounded-xl object-cover"
+                        src={pictureUrl}
+                        alt="Profile image"
+                    />
+                    <p className="font-bold my-2 dark:text-white">
+                        {name}
+                    </p>
+                </div>
+                <button
+                    className="w-full p-3 text-cyan-600 hover:bg-gray-200 dark:text-white dark:bg-gray-800 dark:hover:bg-gray-200 dark:hover:text-cyan-600"
+                    onClick={chatOrAddFriendHandler}
+                >
+                    {isFriend ? 'Chat' : (type === 'Users' ? 'Add Friend' : 'Join Group')}
+                </button>
+                <button
+                    className="w-full p-3 text-cyan-600 hover:bg-gray-200 dark:text-white dark:bg-gray-800 dark:hover:bg-gray-200 dark:hover:text-cyan-600"
+                    onClick={closeModal}
+                >
+                    Cancel
+                </button>
             </div>
-            <button 
-                className="w-full p-3 text-cyan-600 hover:bg-gray-200"
-                onClick={chatOrAddFriendHandler}
-                >
-                {isFriend ? 'Chat' : (type === 'Users' ? 'Add Friend' : 'Join Group')}
-            </button>
-            <button 
-                className="w-full p-3 text-cyan-600 hover:bg-gray-200"
-                onClick={closeModal}
-                >
-                Cancel
-            </button>
         </Modal>
     )
 }
