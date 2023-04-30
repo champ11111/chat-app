@@ -1,6 +1,6 @@
 import React, { useState, useEffect, FC, Dispatch, SetStateAction } from 'react';
 import Modal from 'react-modal';
-import { createRoom, addUserToRoom, getRooms } from '../api/room';
+import { createRoom, addUserToRoom, getRooms, getRoomById } from '../api/room';
 import { getUserByID } from '../api/user';
 import { getUID } from '../utils/jwtGet';
 import User from '../types/user';
