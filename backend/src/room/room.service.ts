@@ -1,4 +1,4 @@
-import { 
+import {
   Injectable,
   ConflictException,
   NotFoundException,
@@ -44,10 +44,17 @@ export class RoomService {
       dto.groupPictureUrl =
         'https://geodash.gov.bd/uploaded/people_group/default_group.png';
     }
+    let isGroupChatBool;
+
+    if (dto.isGroupChat === 'true') {
+      isGroupChatBool = true;
+    } else if (dto.isGroupChat === 'false') {
+      isGroupChatBool = false;
+    }
 
     const room = new Room();
     room.name = dto.name;
-    room.isGroupChat = dto.isGroupChat;
+    room.isGroupChat = isGroupChatBool;
     room.groupPictureUrl = dto.groupPictureUrl;
     room.userRoomRelations = [];
 

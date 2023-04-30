@@ -1,6 +1,6 @@
 export class CreateRoomDto {
   name: string;
-  isGroupChat: boolean;
+  isGroupChat: string;
   groupPictureUrl: string;
   userIds: number[];
 }
