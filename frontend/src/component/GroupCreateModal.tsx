@@ -9,7 +9,8 @@ interface Props {
     users : {
         profilePictureURL: string;
         nickname: string;
-        isFriend?: boolean;
+        isJoined?: boolean;
+        id: number;
     }[];
 }
 
@@ -48,13 +49,11 @@ const GroupCreateModal: FC<Props> = ({ isOpen, closeModal, users }) => {
     }
     const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
-        const fileExtension = groupPicture.split("data:image/")[1].split(";base64,")[0]
-        console.log(fileExtension)
         const formData = {
             name: groupName,
             isGroupChat: true,
             userIds: groupMembers,
-            groupPicture: groupPicture?groupPicture.split(",")[1]+"."+fileExtension:""
+            groupPicture: groupPicture?groupPicture.split(",")[1]+".png":""
         }
         const createRoomHandler = async () => {
             const response = await createRoom(formData)
@@ -121,8 +120,8 @@ const GroupCreateModal: FC<Props> = ({ isOpen, closeModal, users }) => {
                     />
                     <label className="font-bold self-start text-gray-800 dark:text-white mt-2" htmlFor="groupMembers">Group Members</label>
                     {
-                        users.map((user, index) => (
-                            <div key={index} className="flex items-center justify-between w-full mt-2">
+                        users.map((user) => (
+                            <div key={user.id} className="flex items-center justify-between w-full mt-2">
                                 <div className="flex items-center">
                                     <img
                                         className="w-10 h-10 rounded-full"
@@ -134,13 +133,13 @@ const GroupCreateModal: FC<Props> = ({ isOpen, closeModal, users }) => {
                                 <input
                                     className="w-5 h-5"
                                     type="checkbox"
-                                    checked={groupMembers.includes(index)}
+                                    checked={groupMembers.includes(user.id)}
                                     onChange={(e) => {
                                         if (e.target.checked) {
-                                            setGroupMembers((prev) => [...prev, index])
+                                            setGroupMembers((prev) => [...prev, user.id])
                                     }
                                         else {
-                                            setGroupMembers((prev) => prev.filter((member) => member !== index))
+                                            setGroupMembers((prev) => prev.filter((member) => member !== user.id))
                                         }
                                     }}
                                 />
