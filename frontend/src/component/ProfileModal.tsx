@@ -68,6 +68,7 @@ const ProfileModal: FC<Props> = ({ type, name, isFriend, isJoined, pictureUrl, i
         if (isFriendState || isJoinedState) {
             // chat
             setChatId(id);
+            closeModal();
         } else {
             // add friend
             if (type === 'Users') {
