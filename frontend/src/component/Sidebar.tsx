@@ -40,7 +40,7 @@ const Sidebar: FC<Props> = ({myProfile, users, groups}) => {
                     </p>
                 <PlusSquareFilled 
                     onClick={() => setIsModalOpen(true)}
-                    className='text-2xl text-gray-800 cursor-pointer dark:text-gray-400'
+                    className='text-2xl text-gray-800 cursor-pointer dark:text-gray-400 transform hover:scale-110 duration transition ease-in-out'
                 />
             </div>
             <MyProfileCard

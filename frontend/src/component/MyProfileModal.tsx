@@ -1,4 +1,4 @@
-import { useState, useEffect, FC } from "react";
+import { useState, useEffect, FC,useRef } from "react";
 import Modal from "react-modal";
 import { getUser } from "../api/user";
 import { getUID } from "../utils/jwtGet"
@@ -33,6 +33,7 @@ const MyProfileModal: FC<Props> = ({
     const [email, setEmail] = useState<string>("");
     const [password, setPassword] = useState<string>("");
     const [profilePictureURL, setProfilePictureURL] = useState<string>("");
+    const [file, setFile] = useState<File | null>(null);
     const [isDarkMode, setIsDarkMode] = useState<boolean>(localStorage.getItem("darkMode") === "true")
     
     async function fetchUserInfo() {
@@ -41,12 +42,24 @@ const MyProfileModal: FC<Props> = ({
         setNickname(response.data.username);
         setEmail(response.data.email);
         setPassword(response.data.password);
-        setProfilePictureURL(response.data.profileURL);
-        console.log(response.data.username)
+        setProfilePictureURL(response.data.profilePictureUrl);
     }
 
-    function handleUpdateProfile() {
-        
+    function handleProfilePictureClick() {
+        // Open the file selector when the profile picture is clicked
+        const fileInput = document.getElementById("profile-picture-input");
+        if (fileInput) {
+            fileInput.click();
+        }
+    }
+
+    function handleFileSelect(event: React.ChangeEvent<HTMLInputElement>) {
+        const selectedFile = event.target.files?.[0];
+        if (selectedFile) {
+            setFile(selectedFile);
+            console.log(typeof selectedFile)
+            setProfilePictureURL(URL.createObjectURL(selectedFile));
+        }
     }
 
     useEffect(() => {
@@ -68,12 +81,22 @@ const MyProfileModal: FC<Props> = ({
             <div className={`${isDarkMode ? 'dark' : ''}`}>
                 <div className="flex flex-col items-center dark:bg-gray-800 px-16 pt-10 pb-10">
                     <h1 className="text-2xl text-gray-800 dark:text-white font-semibold mb-8">My Profile</h1>
-                    <img
-                        className="w-28 h-28 rounded-xl object-cover"
-                        src = {profilePictureURL}
-                        alt="Profile image"
+                    <label>
+                        <img
+                            className="w-28 h-28 rounded-full object-cover cursor-pointer"
+                            src={profilePictureURL}
+                            alt="Profile image"
+                            onClick={handleProfilePictureClick}
+                        />
+                    </label>
+                    <input
+                        type="file"
+                        id="profile-picture-input"
+                        style={{ display: "none" }}
+                        accept="image/*"
+                        onChange={handleFileSelect}
                     />
-                    <label className="block font-semibold my-2 text-gray-800 dark:text-white rounded-lg pt-2 px-3 w-full center" htmlFor="username">
+                    <label className="block font-semibold my-2 text-gray-800 dark:text-white rounded-lg pt-6 px-3 w-full center" htmlFor="username">
                         Nickname
                     </label>
                     <input
@@ -84,7 +107,7 @@ const MyProfileModal: FC<Props> = ({
                         placeholder = {nickname}
                         onChange={(e) => setNickname(e.target.value)}
                     />
-                    <label className="block font-semibold my-2 text-gray-800 dark:text-white rounded-lg pt-4 px-3 w-full" htmlFor="email">
+                    <label className="block font-semibold my-2 text-gray-800 dark:text-white rounded-lg pt-2 px-3 w-full" htmlFor="email">
                         Email
                     </label>
                     <input
@@ -95,7 +118,7 @@ const MyProfileModal: FC<Props> = ({
                         placeholder = {email}
                         onChange={(e) => setEmail(e.target.value)}
                     />
-                    <label className="block font-semibold my-2 text-gray-800 dark:text-white rounded-lg pt-4 px-3 w-full" htmlFor="password">
+                    <label className="block font-semibold my-2 text-gray-800 dark:text-white rounded-lg pt-2 px-3 w-full" htmlFor="password">
                         Password
                     </label>
                     <input
@@ -107,9 +130,9 @@ const MyProfileModal: FC<Props> = ({
                         onChange={(e) => setPassword(e.target.value)}
                     />
                 <div
-                    className="flex items-center justify between dark:bg-gray-800 mt-8"
+                    className="flex items-center justify between dark:bg-gray-800 mt-4"
                 >
-                     <button
+                    <button
                         className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg my-2 mt-5 mx-2 transition duration-500 ease-in-out transform hover:-translate-y-1 hover:scale-110"
                         onClick={closeModal}
                     >
@@ -122,7 +145,6 @@ const MyProfileModal: FC<Props> = ({
                         Cancel
                     </button>
                 </div>
-                   
                 </div>
             </div>
         </Modal>
