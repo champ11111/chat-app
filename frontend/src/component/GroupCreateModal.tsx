@@ -1,10 +1,16 @@
 import { FC, useState, useEffect } from 'react'
 import Modal from 'react-modal'
 import { CameraOutlined } from '@ant-design/icons'
+import { createRoom } from '../api/room'
 
 interface Props {
     isOpen: boolean;
     closeModal: () => void;
+    users : {
+        profilePictureURL: string;
+        nickname: string;
+        isFriend?: boolean;
+    }[];
 }
 
 const modalStyles = {
@@ -21,13 +27,47 @@ const modalStyles = {
     }
 }
 
-const GroupCreateModal: FC<Props> = ({ isOpen, closeModal }) => {
+const GroupCreateModal: FC<Props> = ({ isOpen, closeModal, users }) => {
     const [isDarkMode, setIsDarkMode] = useState<boolean>(localStorage.getItem("darkMode") === "true")
     useEffect(() => {
         setIsDarkMode(localStorage.getItem("darkMode") === "true")
     }, [localStorage.getItem("darkMode")])
     const [groupName, setGroupName] = useState<string>('')
     const [groupPicture, setGroupPicture] = useState<string>("https://chapabc.s3.us-west-1.amazonaws.com/defaultProfile.jpeg")
+    const [groupMembers, setGroupMembers] = useState<number[]>([])
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files) {
+            const file = e.target.files[0]
+            const reader = new FileReader()
+            reader.readAsDataURL(file)
+            reader.onloadend = () => {
+                setGroupPicture(reader.result as string)
+                console.log("reader.result :", reader.result)
+            }
+        }
+    }
+    const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault()
+        const fileExtension = groupPicture.split("data:image/")[1].split(";base64,")[0]
+        console.log(fileExtension)
+        const formData = {
+            name: groupName,
+            isGroupChat: true,
+            userIds: groupMembers,
+            groupPicture: groupPicture?groupPicture.split(",")[1]+"."+fileExtension:""
+        }
+        const createRoomHandler = async () => {
+            const response = await createRoom(formData)
+            console.log("response :", response)
+        }
+        createRoomHandler()
+        setGroupName('')
+        setGroupPicture('https://chapabc.s3.us-west-1.amazonaws.com/defaultProfile.jpeg')
+        setGroupMembers([])
+        closeModal()
+    }
+
+    console.log(groupMembers)
 
     return (
         <Modal
@@ -36,7 +76,7 @@ const GroupCreateModal: FC<Props> = ({ isOpen, closeModal }) => {
             onRequestClose={closeModal}
         >
             <div className={`${isDarkMode ? 'dark' : ''}`}>
-                <form className="flex flex-col items-center w-full dark:bg-gray-800 p-2">
+                <form className="flex flex-col items-center w-full dark:bg-gray-800 p-2" onSubmit={handleFormSubmit}>
                     <div className="flex justify-between p-2 w-full dark:bg-gray-800">
                         <button
                             className="text-blue-600 border-none bg-white dark:bg-gray-800 dark:text-blue-400"
@@ -46,7 +86,6 @@ const GroupCreateModal: FC<Props> = ({ isOpen, closeModal }) => {
                         </button>
                         <button
                             className="text-blue-600 border-none bg-white dark:bg-gray-800 dark:text-blue-400"
-                            onClick={closeModal}
                             type='submit'
                         >
                             Create
@@ -66,6 +105,7 @@ const GroupCreateModal: FC<Props> = ({ isOpen, closeModal }) => {
                                     type='file'
                                     accept="image/*"
                                     className="absolute opacity-0 w-full h-full cursor-pointer"
+                                    onChange={handleFileChange}
                                 />
                             </div>
                         </div>
@@ -79,7 +119,34 @@ const GroupCreateModal: FC<Props> = ({ isOpen, closeModal }) => {
                         value={groupName}
                         onChange={(e) => setGroupName(e.target.value)}
                     />
-
+                    <label className="font-bold self-start text-gray-800 dark:text-white mt-2" htmlFor="groupMembers">Group Members</label>
+                    {
+                        users.map((user, index) => (
+                            <div key={index} className="flex items-center justify-between w-full mt-2">
+                                <div className="flex items-center">
+                                    <img
+                                        className="w-10 h-10 rounded-full"
+                                        src={user.profilePictureURL}
+                                        alt="User profile"
+                                    />
+                                    <p className="text-gray-800 dark:text-white ml-3">{user.nickname}</p>
+                                </div>
+                                <input
+                                    className="w-5 h-5"
+                                    type="checkbox"
+                                    checked={groupMembers.includes(index)}
+                                    onChange={(e) => {
+                                        if (e.target.checked) {
+                                            setGroupMembers((prev) => [...prev, index])
+                                    }
+                                        else {
+                                            setGroupMembers((prev) => prev.filter((member) => member !== index))
+                                        }
+                                    }}
+                                />
+                            </div>
+                        ))
+                    }
                 </form>
             </div>
         </Modal>

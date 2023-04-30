@@ -30,6 +30,7 @@ const Sidebar: FC<Props> = ({myProfile, users, groups}) => {
         <GroupCreateModal
             isOpen={isModalOpen}
             closeModal={() => setIsModalOpen(false)}
+            users={users}
         />
         <div className="flex flex-col w-1/4 h-screen">
             <div className="flex justify-between p-2 border-b border-gray-300 dark:border-gray-700">
