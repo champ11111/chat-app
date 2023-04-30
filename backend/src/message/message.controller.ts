@@ -6,10 +6,16 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Req,
+  NotFoundException
 } from '@nestjs/common';
 import { MessageService } from './message.service';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { Message } from 'src/entities';
+
+interface CustomRequest extends Request {
+  uid?: number;
+}
 
 @Controller('messages')
 export class MessageController {
@@ -17,19 +23,31 @@ export class MessageController {
 
   //Find all messages
   @Get('')
-  findAll(): Promise<Message[]> {
-    return this.service.findMessages();
+  async findAll(): Promise<Message[]> {
+    const messages = await this.service.findMessages();
+    if (messages.length === 0) {
+      throw new NotFoundException('Messages not found');
+    }
+    return messages;
   }
 
   //Find messages by room id
   @Get(':roomId')
-  findByRoomId(@Param('roomId', new ParseIntPipe()) roomId: number) {
-    return this.service.findMessagesByRoomId(roomId);
+  async findByRoomId(@Param('roomId', new ParseIntPipe()) roomId: number) {
+    const message = await this.service.findMessagesByRoomId(roomId);
+    if (message.length === 0) {
+      throw new NotFoundException('Message not found');
+    }
+    return message;
   }
 
   //Create a new message
   @Post('')
-  create(@Body() dto: CreateMessageDto): Promise<Message> {
+  create(
+    @Body() dto: CreateMessageDto,
+    @Req() req: CustomRequest,
+  ): Promise<Message> {
+    dto.senderId = req.uid;
     return this.service.createMessage(dto);
   }
 
