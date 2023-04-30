@@ -23,7 +23,7 @@ export class RoomController {
   @Get('')
   async findAll(): Promise<Room[]> {
     const rooms = await this.roomService.findRooms();
-    if(rooms.length === 0){
+    if (rooms.length === 0) {
       throw new NotFoundException('Rooms not found');
     }
     return rooms;
@@ -45,7 +45,6 @@ export class RoomController {
     @Body() dto: CreateRoomDto,
     @UploadedFile() file: Express.Multer.File,
   ): Promise<Room> {
-    console.log('dto', dto);
     return this.roomService.createRoom(dto, file);
   }
 
