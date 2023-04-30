@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 import Home from "./page/Home";
@@ -19,11 +19,14 @@ const router = createBrowserRouter([
 
 function App() {
   const [lightMode, setLightMode] = useState(false); // [state, setState
-  const [darkMode, setDarkMode] = useState(false);
-  console.log(darkMode)
+  const [darkMode, setDarkMode] = useState(localStorage.getItem("darkMode") === "true" ? true : false);
+  useEffect(() => {
+      localStorage.setItem("darkMode", JSON.stringify(darkMode))
+  }, [darkMode])
+
   return (
     <div className={darkMode ? "dark" : ""}>
-      <button onClick={() => setDarkMode(!darkMode)}>Toggle Dark Mode</button>
+      <button onClick={() => setDarkMode((prev)=>!prev)}>Toggle Dark Mode</button>
       <div className="dark:bg-gray-800 transition duration-500">
         <RouterProvider router={router} />
       </div>

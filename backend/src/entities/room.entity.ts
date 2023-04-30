@@ -35,9 +35,13 @@ export class Room {
   @OneToMany(
     () => UserRoomRelation,
     (userRoomRelation) => userRoomRelation.room,
+    {onDelete: 'CASCADE'}
   )
   userRoomRelations: UserRoomRelation[];
 
-  @OneToMany(() => Message, (message) => message.room)
+  @OneToMany(
+    () => Message, (message) => message.room,
+    {onDelete: 'CASCADE'}
+    )
   messages: Message[];
 }
