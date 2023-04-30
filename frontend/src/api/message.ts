@@ -10,8 +10,10 @@ export const getMessagesByRoomId = (roomId: number) => {
 
 export const sendMessageToRoom = (roomId: number, content: string, type: string) => {
     return api.post(`/messages`,{ content,type,roomId },{
+        //i want to send the token to the backend
         headers: {
-            'Content-Type': 'multipart/form-data'
-        }
-    })
-}
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          }
+        })
+}       

@@ -3,8 +3,10 @@ import { useNavigate } from "react-router-dom";
 import  Message  from "../types/message";
 import { getMessagesByRoomId, sendMessageToRoom } from "../api/message";
 import { ChatIdContext } from '../page/Chat';
+import { getUID } from "../utils/jwtGet";
 
 export default function ChatRoom() {
+  const [uid, setUID] = useState(getUID());
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const navigate = useNavigate();
@@ -23,7 +25,7 @@ export default function ChatRoom() {
   const handleNewMessage = () => {
     const sendMessage = async () => {
       const res = await sendMessageToRoom(chatId, newMessage, "text");
-      setMessages((prevMessages) => [...prevMessages, res.data.content]);
+      setMessages((prevMessages) =>  [...prevMessages, res.data]);
       setNewMessage("");
     }
     sendMessage();
@@ -40,7 +42,9 @@ export default function ChatRoom() {
 
 
   return (
-    <div className="min-h-full flex flex-col justify-between">
+    <>
+    {chatId != 0? (
+      <div className="min-h-full flex flex-col justify-between">
       <div className="bg-gray-800 py-2 px-4 text-gray-200 flex items-center justify-between">
         <h1 className="text-lg font-bold">Chatroom</h1>
         <div className="flex items-center space-x-4">
@@ -56,26 +60,27 @@ export default function ChatRoom() {
         </div>
       </div>
       <div className="flex-1 overflow-y-scroll p-4">
-        {messages.length > 0 ? (messages.map((message) => (
-          <div
-            key={message.id}
-            className="flex flex-col space-y-1 mb-4"
-          >
-            <div className="flex items-center">
-              <div className="bg-gray-700 rounded-full w-8 h-8 flex items-center justify-center">
-                  <img
-                    className='w-full h-full object-cover rounded-full'
-                    src={message.sender.profilePictureUrl}
-                    alt="Profile image"
-                />
+        {messages.length > 0? (messages.map((message) => (
+            <div
+              key={message.id}
+              className={`flex flex-col space-y-1 mb-4 ${message.sender.id === uid ? '' : ''}`}
+            >
+              <div className="flex items-center">
+                <div className="bg-gray-700 rounded-full w-8 h-8 flex items-center justify-center">
+                    <img
+                      className='w-full h-full object-cover rounded-full'
+                      src={message.sender.profilePictureUrl}
+                      alt="Profile image"
+                  />
+                </div>
+                <div className="ml-2">
+                  <h3 className="text-sm font-bold">{message.sender.username}</h3>
+                  <p className="text-sm">{message.content}</p>
+                </div>
               </div>
-              <div className="ml-2">
-                <h3 className="text-sm font-bold">{message.sender.username}</h3>
-                <p className="text-sm">{message.content}</p>
-              </div>
+              <span className="text-xs text-gray-400">{message.updatedAt}</span>
             </div>
-            <span className="text-xs text-gray-400">{message.updatedAt}</span>
-          </div>
+         
         ))) : <></>}
       </div>
       <div className="bg-gray-200 py-2 px-4">
@@ -98,6 +103,17 @@ export default function ChatRoom() {
         </form>
       </div>
     </div>
+    ):(
+      <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
+        <h1 className="text-4xl font-bold mb-4">Welcome to Chat!</h1>
+        <p className="text-gray-700 text-lg text-center">
+          Select a chat to start talking.
+        </p>
+      </div>
+    )}
+    
+    </>
+    
   );
 };
 
