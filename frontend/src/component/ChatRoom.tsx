@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import  Message  from "../types/message";
-import { getMessagesByRoomId, sendMessageToRoom } from "../api/message";
+import { getMessagesByRoomId, sendMessageToRoom, markMessageAsRead } from "../api/message";
 import { ChatIdContext } from '../page/Chat';
 import { getUID } from "../utils/jwtGet";
 

@@ -17,3 +17,13 @@ export const sendMessageToRoom = (roomId: number, content: string, type: string)
           }
         })
 }       
+
+export const markMessageAsRead = (messageId: number,userId : number) => {
+    return api.patch(`/messages/markAsRead`, {messageId, userId },{
+        //i want to send the token to the backend
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          }
+        })
+}
