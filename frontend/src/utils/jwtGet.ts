@@ -12,3 +12,4 @@ export const getUID = () => {
     const decoded: jwtPayload = jwt_decode(token);
     return decoded.uid;
 }
+
