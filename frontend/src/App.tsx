@@ -19,7 +19,7 @@ const router = createBrowserRouter([
 
 function App() {
   const [lightMode, setLightMode] = useState(false); // [state, setState
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(localStorage.getItem("darkMode") === "true" ? true : false);
   useEffect(() => {
       localStorage.setItem("darkMode", JSON.stringify(darkMode))
   }, [darkMode])
