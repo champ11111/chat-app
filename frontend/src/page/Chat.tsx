@@ -1,4 +1,4 @@
-import {useState, useEffect} from 'react';
+import {useState, useEffect, useRef} from 'react';
 import Sidebar from '../component/Sidebar';
 import Chatroom from '../component/ChatRoom';
 import { getUsers, getUserByID } from '../api/user';
@@ -6,6 +6,8 @@ import { getRooms } from '../api/room';
 import { getUID } from '../utils/jwtGet';
 import User from '../types/user';
 import { Room } from '../types/room';
+import { io,Socket } from 'socket.io-client';
+
 
 export default function Chat(){
     const [uid, setUID] = useState(getUID());
@@ -13,6 +15,8 @@ export default function Chat(){
     const [myProfile, setMyProfile] = useState<User>({} as User);
     const [rooms, setRooms] = useState<Room[]>([]);
     const [friends, setFriends] = useState([]);
+    const socket = useRef<Socket | null>(null);
+
     useEffect(() => {
         const fetchUsers = async () => {
             const res = await getUsers();
@@ -32,6 +36,11 @@ export default function Chat(){
         }
         fetchMyProfile();
     }, [])
+
+    useEffect(() => {
+        socket.current = io("ws://localhost:3000");
+        socket.current.emit("addUser", uid);
+    }, [uid])
     // console.log("users", users)
     // console.log("myProfile", myProfile)
     // console.log("rooms", rooms)
@@ -64,7 +73,7 @@ export default function Chat(){
 
             />
             <div id = "main" className = "w-3/4">
-                <Chatroom/>
+                <Chatroom sender = {myProfile.id}/>
             </div>
         </div>
     )

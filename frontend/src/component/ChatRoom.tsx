@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useState,useRef,FC } from "react";
 import { useNavigate } from "react-router-dom";
+import { io, Socket } from "socket.io-client";
+
 
 type Message = {
   id: number;
@@ -8,9 +10,16 @@ type Message = {
   timestamp: string;
 };
 
-export default function ChatRoom() {
+interface ChatRoomProps {
+  sender: number;
+  socket: Socket;
+  
+}
+
+const ChatRoom: FC<ChatRoomProps> = ({sender}: ChatRoomProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
+
   const navigate = useNavigate();
 
   const handleNewMessage = () => {
@@ -20,8 +29,16 @@ export default function ChatRoom() {
       author: "You",
       timestamp: new Date().toLocaleTimeString(),
     };
+
+    const payload = {
+      senderId: sender,
+      content: newMessage,
+      roomId: ,
+
+    }
     setMessages((prevMessages) => [...prevMessages, message]);
     setNewMessage("");
+
   };
 
   const handleSignout = () => {
