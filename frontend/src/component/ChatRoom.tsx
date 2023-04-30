@@ -1,33 +1,42 @@
-import { useState } from "react";
+import { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-
-type Message = {
-  id: number;
-  content: string;
-  author: string;
-  timestamp: string;
-};
+import  Message  from "../types/message";
+import { getMessagesByRoomId, sendMessageToRoom } from "../api/message";
+import { ChatIdContext } from '../page/Chat';
 
 export default function ChatRoom() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const navigate = useNavigate();
+  const {chatId,setChatId} = useContext(ChatIdContext);
+
+  const getMessages = async () => {
+    try {
+      const res = await getMessagesByRoomId(chatId);
+      setMessages(()=>res.data);
+    }
+    catch (err) {
+      setMessages([]);
+    }
+  }
 
   const handleNewMessage = () => {
-    const message: Message = {
-      id: Math.floor(Math.random() * 1000),
-      content: newMessage,
-      author: "You",
-      timestamp: new Date().toLocaleTimeString(),
-    };
-    setMessages((prevMessages) => [...prevMessages, message]);
-    setNewMessage("");
+    const sendMessage = async () => {
+      const res = await sendMessageToRoom(chatId, newMessage, "text");
+      setMessages((prevMessages) => [...prevMessages, res.data.content]);
+      setNewMessage("");
+    }
+    sendMessage();
   };
 
   const handleSignout = () => {
     localStorage.removeItem("token");
     navigate("/");
   };
+
+  useEffect(() => {
+    getMessages();
+  }, [chatId]);
 
 
   return (
@@ -47,23 +56,27 @@ export default function ChatRoom() {
         </div>
       </div>
       <div className="flex-1 overflow-y-scroll p-4">
-        {messages.map((message) => (
+        {messages.length > 0 ? (messages.map((message) => (
           <div
             key={message.id}
             className="flex flex-col space-y-1 mb-4"
           >
             <div className="flex items-center">
               <div className="bg-gray-700 rounded-full w-8 h-8 flex items-center justify-center">
-                <span className="text-sm font-bold">{message.author.charAt(0)}</span>
+                  <img
+                    className='w-full h-full object-cover rounded-full'
+                    src={message.sender.profilePictureUrl}
+                    alt="Profile image"
+                />
               </div>
               <div className="ml-2">
-                <h3 className="text-sm font-bold">{message.author}</h3>
+                <h3 className="text-sm font-bold">{message.sender.username}</h3>
                 <p className="text-sm">{message.content}</p>
               </div>
             </div>
-            <span className="text-xs text-gray-400">{message.timestamp}</span>
+            <span className="text-xs text-gray-400">{message.updatedAt}</span>
           </div>
-        ))}
+        ))) : <></>}
       </div>
       <div className="bg-gray-200 py-2 px-4">
         <form onSubmit={(e) => e.preventDefault()}>
