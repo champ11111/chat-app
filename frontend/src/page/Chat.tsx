@@ -1,7 +1,7 @@
 import {useState, useEffect} from 'react';
 import Sidebar from '../component/Sidebar';
 import Chatroom from '../component/ChatRoom';
-import { getUsers } from '../api/user';
+import { getUsers, getUserByID } from '../api/user';
 import { getRooms } from '../api/room';
 import { getUID } from '../utils/jwtGet';
 import User from '../types/user';
@@ -12,12 +12,12 @@ export default function Chat(){
     const [users, setUsers] = useState<User[]>([]);
     const [myProfile, setMyProfile] = useState<User>({} as User);
     const [rooms, setRooms] = useState<Room[]>([]);
+    const [friends, setFriends] = useState([]);
     useEffect(() => {
         const fetchUsers = async () => {
             const res = await getUsers();
             // console.log(res)
             setUsers(()=>res.data.filter((user: User) => user.id !== uid));
-            setMyProfile(()=>res.data.filter((user: User) => user.id === uid)[0]);
         }
         fetchUsers();
         const fetchRooms = async () => {
@@ -25,6 +25,12 @@ export default function Chat(){
             setRooms(()=>res.data);
         }
         fetchRooms();
+        const fetchMyProfile = async () => {
+            const res = await getUserByID(uid);
+            setMyProfile(()=>res.data);
+            setFriends(()=>res.data.userRoomRelations.map((friend) => friend.user.id));
+        }
+        fetchMyProfile();
     }, [])
     // console.log("users", users)
     // console.log("myProfile", myProfile)
@@ -38,17 +44,20 @@ export default function Chat(){
             <Sidebar 
                 myProfile = {{
                     "profilePictureURL" : myProfile.profilePictureUrl,
-                    "nickname" : myProfile.username
+                    "nickname" : myProfile.username,
+                    "id" : myProfile.id
                 }}
                 users = {users.map((user: User) => ({
                     "profilePictureURL" : user.profilePictureUrl,
                     "nickname" : user.username,
-                    "isFriend" : true
+                    "id" : user.id,
+                    "isFriend" : false
                 }))}
 
                 groups = {rooms.filter((room: Room) => room.isGroupChat).map((room: Room) => ({
                     "profilePictureURL": room.groupPictureUrl,
                     "nickname": room.name,
+                    "id": room.id,
                     "isJoined": room.userRoomRelations.some((userRoomRelation) => userRoomRelation.user.id === uid)
                 }))}
                 
