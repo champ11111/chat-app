@@ -9,3 +9,7 @@ interface RegisterData {
 export const getUsers = () => {
     return api.get('/users')
 }
+
+export const getUserByID = (id: number) => {
+    return api.get(`/users/${id}`)
+}

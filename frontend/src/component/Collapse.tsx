@@ -6,12 +6,14 @@ interface Users {
     profilePictureURL: string;
     nickname: string;
     isFriend?: boolean;
+    id: number;
 }[];
 
 interface Groups {
     profilePictureURL: string;
     nickname: string;
     isJoined?: boolean;
+    id: number;
 }[];
 
 interface Props {
@@ -54,6 +56,7 @@ const Collapse: FC<Props> = ({ type, users, groups }) => {
                         nickname={item.nickname}
                         isFriend={item.isFriend}
                         isJoined={item.isJoined}
+                        id={item.id}
                     />
                 ))}
             </div>
