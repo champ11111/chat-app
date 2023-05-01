@@ -4,6 +4,7 @@ import  Message  from "../types/message";
 import { getMessagesByRoomId, sendMessageToRoom, markMessageAsRead } from "../api/message";
 import { ChatIdContext } from '../page/Chat';
 import { getUID } from "../utils/jwtGet";
+import { io } from "socket.io-client";
 
 export default function ChatRoom() {
   const [uid, setUID] = useState(getUID());
@@ -11,11 +12,14 @@ export default function ChatRoom() {
   const [newMessage, setNewMessage] = useState("");
   const navigate = useNavigate();
   const {chatId,setChatId} = useContext(ChatIdContext);
+  const [socket, setSocket] = useState(null);
 
   const getMessages = async () => {
     try {
       const res = await getMessagesByRoomId(chatId);
-      setMessages(()=>res.data);
+      const newMessages = [...res.data];
+      newMessages.sort((a, b) => new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime());
+      setMessages(newMessages);
     }
     catch (err) {
       setMessages([]);
@@ -25,7 +29,10 @@ export default function ChatRoom() {
   const handleNewMessage = () => {
     const sendMessage = async () => {
       const res = await sendMessageToRoom(chatId, newMessage, "text");
-      setMessages((prevMessages) =>  [...prevMessages, res.data]);
+      if (socket){
+        socket.emit('new message', res.data);
+      }
+      setMessages((prevMessages) =>  [...prevMessages, res.data].sort((a, b) => new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime()));
       setNewMessage("");
     }
     sendMessage();
@@ -35,10 +42,52 @@ export default function ChatRoom() {
     localStorage.removeItem("token");
     navigate("/");
   };
+  
+  useEffect(() => {
+    setChatId(0);
+    
+    const newSocket = io('http://localhost:3000'); // replace with your server URL
+    setSocket(newSocket);
+
+    return () => {
+      newSocket.off('message received');
+      newSocket.disconnect();
+    };
+  }, []);
 
   useEffect(() => {
+    if (socket) {
+      socket.on('connect', () => {
+        console.log('Connected to server');
+        socket.emit('setup', {user:{ _id: uid }}); // replace with your user ID
+      });
+  
+      socket.on('join room', (chatId) => {
+        console.log('New room joined', chatId);
+        socket.emit('join room', chatId);
+      });
+
+      socket.on('message received', (receivedMessage) => {
+        if (receivedMessage){
+          console.log('New message received', receivedMessage);
+          setMessages((prevMessages) =>  [...prevMessages, receivedMessage].sort((a, b) => new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime()));
+        }
+      });
+  
+      return () => {
+        socket.off('connect');
+        socket.off('join room');
+      };
+    }
+  }, [socket]);
+  
+  useEffect(() => {
     getMessages();
+    if (socket) {
+      socket.emit('join room', chatId);
+    }
   }, [chatId]);
+  
 
 
   return (
