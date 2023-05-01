@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import Home from "./page/Home";
 import ErrorPage from "./page/Error"
@@ -26,6 +28,9 @@ function App() {
 
   return (
     <div className={darkMode ? "dark" : ""}>
+      <ToastContainer 
+          position="top-center"
+      />
       <button onClick={() => setDarkMode((prev)=>!prev)}>Toggle Dark Mode</button>
       <div className="dark:bg-gray-800 transition duration-500">
         <RouterProvider router={router} />

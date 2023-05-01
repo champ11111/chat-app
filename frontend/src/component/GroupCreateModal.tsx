@@ -3,6 +3,7 @@ import { ChatIdContext } from '../page/Chat'
 import Modal from 'react-modal'
 import { CameraOutlined } from '@ant-design/icons'
 import { createRoom } from '../api/room'
+import { toast } from 'react-toastify'
 
 interface Props {
     isOpen: boolean;
@@ -39,6 +40,7 @@ const GroupCreateModal: FC<Props> = ({ isOpen, closeModal, users }) => {
     const [displayedGroupPicture, setDisplayedGroupPicture] = useState<string>("https://geodash.gov.bd/uploaded/people_group/default_group.png")
     const [groupPicture, setGroupPicture] = useState<File>()
     const [groupMembers, setGroupMembers] = useState<number[]>([])
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
             const file = e.target.files[0]
@@ -52,6 +54,10 @@ const GroupCreateModal: FC<Props> = ({ isOpen, closeModal, users }) => {
     }
     const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
+        if (isSubmitting) {
+            return
+        }
+        setIsSubmitting(true)
         const formData = new FormData()
         formData.append('name', groupName);
         formData.append('isGroupChat', 'true')
@@ -61,6 +67,7 @@ const GroupCreateModal: FC<Props> = ({ isOpen, closeModal, users }) => {
         if (groupPicture) {
             formData.append('groupPicture', groupPicture, groupPicture.name);
         }
+        const toastId = toast.loading('Creating group...')
         try{
             const res = await createRoom(formData)
             setFetchTrigger((prev) => !prev)
@@ -68,10 +75,22 @@ const GroupCreateModal: FC<Props> = ({ isOpen, closeModal, users }) => {
             setGroupPicture(undefined)
             setDisplayedGroupPicture('https://geodash.gov.bd/uploaded/people_group/default_group.png')
             setGroupMembers([])
-            closeModal()
+            toast.update(toastId, {
+                render: 'Group created!',
+                type: 'success',
+                isLoading: false,
+                autoClose: 2000,
+            })
         } catch (e) {
-            console.log(e)
+            toast.update(toastId, {
+                render: 'Failed to create group',
+                type: 'error',
+                isLoading: false,
+                autoClose: 2000,
+            })
         }
+        setIsSubmitting(false)
+        closeModal()
     }
 
 
