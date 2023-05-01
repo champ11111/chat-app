@@ -1,4 +1,5 @@
-import { FC, useState, useEffect } from 'react'
+import { FC, useState, useEffect, useContext } from 'react'
+import { ChatIdContext } from '../page/Chat'
 import { getRoomById, removeUserFromRoom } from '../api/room';
 import Modal from 'react-modal'
 
@@ -23,6 +24,7 @@ const modalStyles = {
 }
 
 const GroupCreateModal: FC<Props> = ({ isOpen, closeModal, groupID }) => {
+    const { setFetchTrigger } = useContext(ChatIdContext)
     const [isDarkMode, setIsDarkMode] = useState<boolean>(localStorage.getItem("darkMode") === "true")
     const [selectedMemberID, setSelectedMemberID] = useState<number>(-1)
     const [members, setMembers] = useState<User[]>([])
@@ -33,7 +35,6 @@ const GroupCreateModal: FC<Props> = ({ isOpen, closeModal, groupID }) => {
         }
         fetchMembers()
     }, [ isOpen, groupID ])
-    console.log(members)
     useEffect(() => {
         setIsDarkMode(localStorage.getItem("darkMode") === "true")
     }, [localStorage.getItem("darkMode")])
@@ -45,7 +46,7 @@ const GroupCreateModal: FC<Props> = ({ isOpen, closeModal, groupID }) => {
         }
         const removeMember = async () => {
             const res = await removeUserFromRoom(groupID, selectedMemberID)
-            console.log(res)
+            setFetchTrigger((prev) => !prev)
         }
         removeMember()
         closeModal()

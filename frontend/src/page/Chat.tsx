@@ -16,6 +16,7 @@ export default function Chat(){
     const [rooms, setRooms] = useState<Room[]>([]);
     const [friends, setFriends] = useState([]);
     const [chatId, setChatId] = useState<number>(0);
+    const [fetchTrigger, setFetchTrigger] = useState(false);
 
 
     useEffect(() => {
@@ -36,10 +37,10 @@ export default function Chat(){
             setFriends(()=>res.data.userRoomRelations.map((friend) => friend.user.id));
         }
         fetchMyProfile();
-    }, [])
+    }, [fetchTrigger]);
 
     return (
-        <ChatIdContext.Provider value={{chatId,setChatId}}>
+        <ChatIdContext.Provider value={{chatId,setChatId,setFetchTrigger}}>
             <div id="chat-page" className= "flex w-full min-h-screen">
                 <Sidebar 
                     myProfile = {{

@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import  Message  from "../types/message";
 import { getMessagesByRoomId, sendMessageToRoom, markMessageAsRead } from "../api/message";
 import { ChatIdContext } from '../page/Chat';
+import EditGroupModal from "./EditGroupModal";
+import { UsergroupDeleteOutlined } from "@ant-design/icons";
 import { getUID } from "../utils/jwtGet";
 import { io } from "socket.io-client";
 
@@ -13,6 +15,8 @@ export default function ChatRoom() {
   const navigate = useNavigate();
   const {chatId,setChatId} = useContext(ChatIdContext);
   const [socket, setSocket] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const closeModal = () => setIsModalOpen(false);
 
   const getMessages = async () => {
     try {
@@ -94,6 +98,11 @@ export default function ChatRoom() {
     <>
     {chatId != 0? (
       <div className="min-h-full flex flex-col justify-between">
+        <EditGroupModal
+          isOpen={isModalOpen}
+          closeModal={closeModal}
+          groupID={chatId}
+      />
       <div className="bg-gray-800 py-2 px-4 text-gray-200 flex items-center justify-between">
         <h1 className="text-lg font-bold">Chatroom</h1>
         <div className="flex items-center space-x-4">
@@ -104,7 +113,7 @@ export default function ChatRoom() {
             Sign out
           </button>
           <div className="bg-gray-700 rounded-full w-8 h-8 flex items-center justify-center">
-            <span className="text-sm font-bold">Y</span>
+            <UsergroupDeleteOutlined onClick={() => setIsModalOpen(true)} className="dark:text-white text-xl" />
           </div>
         </div>
       </div>

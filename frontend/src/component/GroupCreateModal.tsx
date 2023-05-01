@@ -1,4 +1,5 @@
-import { FC, useState, useEffect } from 'react'
+import { FC, useState, useEffect, useContext } from 'react'
+import { ChatIdContext } from '../page/Chat'
 import Modal from 'react-modal'
 import { CameraOutlined } from '@ant-design/icons'
 import { createRoom } from '../api/room'
@@ -29,41 +30,48 @@ const modalStyles = {
 }
 
 const GroupCreateModal: FC<Props> = ({ isOpen, closeModal, users }) => {
+    const { setFetchTrigger } = useContext(ChatIdContext)
     const [isDarkMode, setIsDarkMode] = useState<boolean>(localStorage.getItem("darkMode") === "true")
     useEffect(() => {
         setIsDarkMode(localStorage.getItem("darkMode") === "true")
     }, [localStorage.getItem("darkMode")])
     const [groupName, setGroupName] = useState<string>('')
-    const [groupPicture, setGroupPicture] = useState<string>("https://chapabc.s3.us-west-1.amazonaws.com/defaultProfile.jpeg")
+    const [displayedGroupPicture, setDisplayedGroupPicture] = useState<string>("https://geodash.gov.bd/uploaded/people_group/default_group.png")
+    const [groupPicture, setGroupPicture] = useState<File>()
     const [groupMembers, setGroupMembers] = useState<number[]>([])
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
             const file = e.target.files[0]
+            setGroupPicture(file)
             const reader = new FileReader()
             reader.readAsDataURL(file)
             reader.onloadend = () => {
-                setGroupPicture(reader.result as string)
-                // console.log("reader.result :", reader.result)
+                setDisplayedGroupPicture(reader.result as string)
             }
         }
     }
-    const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
-        const formData = {
-            name: groupName,
-            isGroupChat: true,
-            userIds: groupMembers,
-            groupPicture: groupPicture?groupPicture.split(",")[1]+".png":""
+        const formData = new FormData()
+        formData.append('name', groupName);
+        formData.append('isGroupChat', 'true')
+        for (let i = 0; i < groupMembers.length; i++) {
+            formData.append('userIds', groupMembers[i].toString());
         }
-        const createRoomHandler = async () => {
-            const response = await createRoom(formData)
-            // console.log("response :", response)
+        if (groupPicture) {
+            formData.append('groupPicture', groupPicture, groupPicture.name);
         }
-        createRoomHandler()
-        setGroupName('')
-        setGroupPicture('https://chapabc.s3.us-west-1.amazonaws.com/defaultProfile.jpeg')
-        setGroupMembers([])
-        closeModal()
+        try{
+            const res = await createRoom(formData)
+            setFetchTrigger((prev) => !prev)
+            setGroupName('')
+            setGroupPicture(undefined)
+            setDisplayedGroupPicture('https://geodash.gov.bd/uploaded/people_group/default_group.png')
+            setGroupMembers([])
+            closeModal()
+        } catch (e) {
+            console.log(e)
+        }
     }
 
 
@@ -94,7 +102,7 @@ const GroupCreateModal: FC<Props> = ({ isOpen, closeModal, users }) => {
                         <div className="relative flex items-center rounded-full bg-blue-600 p-1 my-2">
                             <img
                                 className="w-32 h-32 rounded-full"
-                                src={groupPicture}
+                                src={displayedGroupPicture}
                                 alt="Group picture"
                             />
                             <div className="absolute flex items-center justify-center bg-blue-600 w-10 h-10 rounded-full right-0 bottom-0">
