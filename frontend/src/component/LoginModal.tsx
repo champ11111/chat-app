@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { toast } from "react-toastify";
 import logo from "../assets/logo.svg";
 import { login } from "../api/auth";
 import { useNavigate } from "react-router-dom";
@@ -6,15 +7,36 @@ import { useNavigate } from "react-router-dom";
 export default function LoginModal() : JSX.Element {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (e: React.MouseEvent<HTMLButtonElement>) => {
     // TODO: Implement login logic
     e.preventDefault();
-    const res = await login({email, password});
-    localStorage.setItem("token", res.data.accessToken)
-    navigate("/main");
-
+    if (isSubmitting) {
+      return;
+    }
+    setIsSubmitting(true);
+    const toastId = toast.loading("Logging in...");
+    try {
+        const res = await login({ email, password });
+        localStorage.setItem("token", res.data.accessToken);
+        toast.update(toastId, {
+          render: "Login successful",
+          type: "success",
+          isLoading: false,
+          autoClose: 2000,
+        });
+        navigate("/main");
+    } catch (err) {
+        toast.update(toastId, {
+          render: "Login failed",
+          type: "error",
+          isLoading: false,
+          autoClose: 2000,
+        });
+    }
+    setIsSubmitting(false);
   };
 
   return (

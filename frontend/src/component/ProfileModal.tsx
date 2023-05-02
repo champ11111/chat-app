@@ -54,8 +54,8 @@ const ProfileModal: FC<Props> = ({ type, name, isFriend, isJoined, pictureUrl, i
     const fetchRoom = async () => {
         const res = await getRoomById(id);
         setPicture(res.data.groupPictureUrl);
-        setIsJoinedState(res.data.name);
-        setNameState(res.data.userRoomRelations.some((userRoomRelation) => userRoomRelation.user.id === uid))
+        setNameState(res.data.name);
+        setIsJoinedState(res.data.userRoomRelations.some((userRoomRelation) => userRoomRelation.user.id === uid))
     };
 
     const fecthRoomId = async () => {

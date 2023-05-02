@@ -1,5 +1,8 @@
-import { FC, useState, useEffect } from 'react'
+import { FC, useState, useEffect, useContext } from 'react'
+import { ChatIdContext } from '../page/Chat'
 import { getRoomById, removeUserFromRoom } from '../api/room';
+import { toast } from 'react-toastify';
+import { AxiosResponse } from 'axios';
 import Modal from 'react-modal'
 
 interface Props {
@@ -23,9 +26,11 @@ const modalStyles = {
 }
 
 const GroupCreateModal: FC<Props> = ({ isOpen, closeModal, groupID }) => {
+    const { setFetchTrigger } = useContext(ChatIdContext)
     const [isDarkMode, setIsDarkMode] = useState<boolean>(localStorage.getItem("darkMode") === "true")
     const [selectedMemberID, setSelectedMemberID] = useState<number>(-1)
     const [members, setMembers] = useState<User[]>([])
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
     useEffect(() => {
         const fetchMembers = async () => {
             const res = await getRoomById(groupID)
@@ -33,21 +38,36 @@ const GroupCreateModal: FC<Props> = ({ isOpen, closeModal, groupID }) => {
         }
         fetchMembers()
     }, [ isOpen, groupID ])
-    console.log(members)
     useEffect(() => {
         setIsDarkMode(localStorage.getItem("darkMode") === "true")
     }, [localStorage.getItem("darkMode")])
 
-    const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
-        if (selectedMemberID === -1) {
+        if (selectedMemberID === -1 || isSubmitting) {
             return
         }
-        const removeMember = async () => {
-            const res = await removeUserFromRoom(groupID, selectedMemberID)
-            console.log(res)
+        setIsSubmitting(true)
+        const toastId = toast.loading("Removing member...")
+        try {
+            const res: AxiosResponse<any, any> = await removeUserFromRoom(groupID, selectedMemberID)
+            setFetchTrigger((prev) => !prev)
+            toast.update(toastId, {
+                render: "Member removed",
+                type: "success",
+                isLoading: false,
+                autoClose: 2000,
+            })
+        } catch (err) {
+            console.log(err)
+            toast.update(toastId, {
+                render: "Failed to remove member",
+                type: "error",
+                isLoading: false,
+                autoClose: 2000,
+            })
         }
-        removeMember()
+        setIsSubmitting(false)
         closeModal()
     }
 

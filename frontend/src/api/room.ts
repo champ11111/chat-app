@@ -1,12 +1,13 @@
 import api from "./api";
 import User from "../types/user";
 
-interface roomCreateData {
+interface FormData {
     name: string;
-    isGroupChat: boolean;
     userIds: number[];
-    groupPicture?: string;
+    groupPicture: File | null;
+    isGroupChat?: boolean;
 }
+
 
 export const getRooms = () => {
     return api.get('/rooms')
@@ -16,8 +17,8 @@ export const getRoomById = (id: number) => {
     return api.get(`/rooms/${id}`)
 }
 
-export const createRoom = (data: roomCreateData) => {
-    return api.post('/rooms', data, 
+export const createRoom = (formData: FormData) => {
+    return api.post('/rooms', formData, 
     {
         headers: {
             'Content-Type': 'multipart/form-data'
