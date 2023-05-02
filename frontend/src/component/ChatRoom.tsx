@@ -1,30 +1,36 @@
-import { useState, useEffect, useContext,useRef,FC } from "react";
+import { useState, useEffect, useContext, useRef,useLayoutEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { io, Socket } from "socket.io-client";
 import  Message  from "../types/message";
-import { getMessagesByRoomId, sendMessageToRoom } from "../api/message";
+import { getMessagesByRoomId, sendMessageToRoom, markMessageAsRead } from "../api/message";
 import { ChatIdContext } from '../page/Chat';
+import EditGroupModal from "./EditGroupModal";
+import { UsergroupDeleteOutlined } from "@ant-design/icons";
 import { getUID } from "../utils/jwtGet";
+import { io } from "socket.io-client";
 
-interface ChatRoomProps {
-  id: number;
-  sender: number | null;
-  socket: Socket | null;
-  
-}
-
-const ChatRoom: FC<ChatRoomProps> = ({id,sender,socket}: ChatRoomProps) => {
+export default function ChatRoom() {
   const [uid, setUID] = useState(getUID());
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
-
   const navigate = useNavigate();
   const {chatId,setChatId} = useContext(ChatIdContext);
+  const [socket, setSocket] = useState(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const closeModal = () => setIsModalOpen(false);
+
+  useLayoutEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages]);
 
   const getMessages = async () => {
     try {
       const res = await getMessagesByRoomId(chatId);
-      setMessages(()=>res.data);
+      const newMessages = [...res.data];
+      newMessages.sort((a, b) => new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime());
+      setMessages(newMessages);
     }
     catch (err) {
       setMessages([]);
@@ -34,41 +40,78 @@ const ChatRoom: FC<ChatRoomProps> = ({id,sender,socket}: ChatRoomProps) => {
   const handleNewMessage = () => {
     const sendMessage = async () => {
       const res = await sendMessageToRoom(chatId, newMessage, "text");
-      setMessages((prevMessages) =>  [...prevMessages, res.data]);
+      if (socket){
+        socket.emit('new message', res.data);
+      }
+      setMessages((prevMessages) =>  [...prevMessages, res.data].sort((a, b) => new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime()));
       setNewMessage("");
     }
     sendMessage();
-
-    socket.emit("sendMessage", {
-      sender: sender,
-      content: newMessage,
-      chatId: chatId,
-    });
   };
-
-
-  useEffect(() => {
-    if(socket){
-      socket.on("getMessage", (data) => {
-        setMessages((prevMessages) => [...prevMessages, data]);
-      });
-    }
-  }, []);
 
   const handleSignout = () => {
     localStorage.removeItem("token");
     navigate("/");
   };
+  
+  useEffect(() => {
+    setChatId(0);
+    
+    const newSocket = io('http://localhost:3000'); // replace with your server URL
+    setSocket(newSocket);
+
+    return () => {
+      newSocket.off('message received');
+      newSocket.disconnect();
+    };
+  }, []);
 
   useEffect(() => {
+    if (socket) {
+      socket.on('connect', () => {
+        console.log('Connected to server');
+        socket.emit('setup', {user:{ _id: uid }}); // replace with your user ID
+      });
+  
+      socket.on('join room', () => {
+        if (chatId!=0){
+          console.log('New room joined', chatId);
+          socket.emit('join room', chatId);
+        }
+      });
+
+      socket.on('message received', (receivedMessage) => {
+        if (receivedMessage){
+          console.log('New message received', receivedMessage);
+          setMessages((prevMessages) =>  [...prevMessages, receivedMessage].sort((a, b) => new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime()));
+        }
+      });
+  
+      return () => {
+        socket.off('connect');
+        socket.off('join room');
+      };
+    }
+  }, [socket]);
+  
+  useEffect(() => {
     getMessages();
+    if (socket && chatId!=0) {
+      socket.emit('join room', chatId);
+    }
   }, [chatId]);
+  
 
 
   return (
     <>
     {chatId != 0? (
-      <div className="min-h-full flex flex-col justify-between">
+      <div className="max-h-screen flex flex-col justify-between">
+        <EditGroupModal
+          isOpen={isModalOpen}
+          closeModal={closeModal}
+          groupID={chatId}
+      />
       <div className="bg-gray-800 py-2 px-4 text-gray-200 flex items-center justify-between">
         <h1 className="text-lg font-bold">Chatroom</h1>
         <div className="flex items-center space-x-4">
@@ -79,12 +122,13 @@ const ChatRoom: FC<ChatRoomProps> = ({id,sender,socket}: ChatRoomProps) => {
             Sign out
           </button>
           <div className="bg-gray-700 rounded-full w-8 h-8 flex items-center justify-center">
-            <span className="text-sm font-bold">Y</span>
+            <UsergroupDeleteOutlined onClick={() => setIsModalOpen(true)} className="dark:text-white text-xl" />
           </div>
         </div>
       </div>
       <div className="flex-1 overflow-y-scroll p-4">
-        {messages.length > 0? (messages.map((message) => (
+        {messages.length > 0? (messages
+        .map((message) => (
             <div
               key={message.id}
               className={`flex flex-col space-y-1 mb-4 ${message.sender.id === uid ? '' : ''}`}
@@ -106,7 +150,8 @@ const ChatRoom: FC<ChatRoomProps> = ({id,sender,socket}: ChatRoomProps) => {
             </div>
          
         ))) : <></>}
-      </div>
+        <div  ref={messagesEndRef}/>
+      </div >
       <div className="bg-gray-200 py-2 px-4">
         <form onSubmit={(e) => e.preventDefault()}>
           <div className="flex items-center space-x-2">
@@ -140,6 +185,4 @@ const ChatRoom: FC<ChatRoomProps> = ({id,sender,socket}: ChatRoomProps) => {
     
   );
 };
-
-export default ChatRoom;
 
