@@ -12,7 +12,7 @@ async function bootstrap() {
       origin: 'http://localhost:8080',
       methods: '*',
       allowedHeaders: ['Content-Type', 'Authorization'],
-      credentials: true,
+      // credentials: true,
     }),
   );
   app.use(cookieParser());

@@ -7,6 +7,8 @@ import EditGroupModal from "./EditGroupModal";
 import { UsergroupDeleteOutlined } from "@ant-design/icons";
 import { getUID } from "../utils/jwtGet";
 import { io } from "socket.io-client";
+import Picker from "emoji-picker-react";
+import {BsEmojiSmileFill} from "react-icons/bs";
 
 export default function ChatRoom() {
   const [uid, setUID] = useState(getUID());
@@ -18,6 +20,7 @@ export default function ChatRoom() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const closeModal = () => setIsModalOpen(false);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
   useLayoutEffect(() => {
     if (messagesEndRef.current) {
@@ -35,6 +38,17 @@ export default function ChatRoom() {
     catch (err) {
       setMessages([]);
     }
+  }
+
+  const handleEmojiPickerHide = () => {
+    setShowEmojiPicker(!showEmojiPicker);
+  }
+  
+  const handleEmojiClick = (e) => {
+    console.log(e.emoji)
+    let msg = newMessage;
+    setNewMessage(msg + e.emoji);
+    setShowEmojiPicker(!showEmojiPicker);
   }
 
   const handleNewMessage = () => {
@@ -112,11 +126,11 @@ export default function ChatRoom() {
           closeModal={closeModal}
           groupID={chatId}
       />
-      <div className="bg-gray-800 py-2 px-4 text-gray-200 flex items-center justify-between">
-        <h1 className="text-lg font-bold">Chatroom</h1>
+      <div className="bg-white dark:bg-gray-800 py-2 px-4 text-gray-800 dark:text-gray-200 flex items-center justify-between transition duration-500">
+        <h1 className="text-lg font-bold ">Chatroom</h1>
         <div className="flex items-center space-x-4">
           <button 
-            className="bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded"
+            className="bg-gray-100 dark:bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded transition duration-500"
             onClick={handleSignout}  
           >
             Sign out
@@ -126,12 +140,12 @@ export default function ChatRoom() {
           </div>
         </div>
       </div>
-      <div className="flex-1 overflow-y-scroll p-4">
+      <div className="flex-1 overflow-y-scroll p-4 gray-800">
         {messages.length > 0? (messages
         .map((message) => (
             <div
               key={message.id}
-              className={`flex flex-col space-y-1 mb-4 ${message.sender.id === uid ? '' : ''}`}
+              className={`flex flex-col space-y-1 mb-4 dark:text-white ${message.sender.id === uid ? '' : ''}`}
             >
               <div className="flex items-center">
                 <div className="bg-gray-700 rounded-full w-8 h-8 flex items-center justify-center">
@@ -152,18 +166,25 @@ export default function ChatRoom() {
         ))) : <></>}
         <div  ref={messagesEndRef}/>
       </div >
-      <div className="bg-gray-200 py-2 px-4">
-        <form onSubmit={(e) => e.preventDefault()}>
-          <div className="flex items-center space-x-2">
+      <div className="Container dark:bg-gray-800 transition duration-500">
+
+          <div className="button-container">
+            <div className="emoji">
+              <BsEmojiSmileFill onClick={handleEmojiPickerHide} />
+              {showEmojiPicker && <Picker onEmojiClick={handleEmojiClick}/>}
+            </div>
+          </div>
+          <form onSubmit={(e) => e.preventDefault()}>
+          <div className="input">
             <input
               type="text"
-              className="w-full border border-gray-300 py-2 px-4 rounded"
+              className="w-full border border-gray-300 dark:bg-gray-700 dark:text-100 py-2 px-4 rounded transition duration-500"
               placeholder="Type a message..."
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
             />
             <button
-              className="bg-blue-500 hover:bg-blue-600 px-4 py-2 text-white font-bold rounded"
+              className="bg-blue-500 hover:bg-blue-600 px-4 py-2 ml-2 text-white font-bold rounded"
               onClick={handleNewMessage}
             >
               Send
@@ -173,9 +194,9 @@ export default function ChatRoom() {
       </div>
     </div>
     ):(
-      <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Chat!</h1>
-        <p className="text-gray-700 text-lg text-center">
+      <div className="flex flex-col items-center justify-center h-screen bg-gray-100 dark:bg-gray-800 darl:text-gray-200 transition duration-500">
+        <h1 className="text-4xl font-bold mb-4 dark:text-gray-200 transition duration-500">Welcome to Chat!</h1>
+        <p className="text-gray-700 dark:text-gray-200 text-lg text-center">
           Select a chat to start talking.
         </p>
       </div>

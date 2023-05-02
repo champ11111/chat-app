@@ -24,6 +24,50 @@
   padding: 0;
 }
 
+.Container {
+  display : grid;
+  grid-template-columns:5% 95%;
+  gap: 1rem;
+  background-color: #edf2f7;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+
+.Container .button-container{
+  display: flex;
+  align-items: center;
+  color: rgb(84, 84, 84);
+  gap: 1rem;
+}
+
+.Container .button-container .emoji {
+  position: relative;
+}
+
+.Container .button-container .emoji svg {
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.Container .button-container .emoji .emoji-picker-react {
+  position: absolute;
+  top: -350px;
+  background-color: #080420;
+}
+
+.Container .input{
+    display: flex;
+    width: 95%;
+    align-items: center;
+    margin-left: 0.5rem;
+    margin-right: 1rem;
+}
+
+
+
+
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
