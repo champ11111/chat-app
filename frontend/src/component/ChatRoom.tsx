@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, useRef,useLayoutEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import  Message  from "../types/message";
 import { getMessagesByRoomId, sendMessageToRoom, markMessageAsRead } from "../api/message";
@@ -13,6 +13,13 @@ export default function ChatRoom() {
   const navigate = useNavigate();
   const {chatId,setChatId} = useContext(ChatIdContext);
   const [socket, setSocket] = useState(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages]);
 
   const getMessages = async () => {
     try {
@@ -62,9 +69,11 @@ export default function ChatRoom() {
         socket.emit('setup', {user:{ _id: uid }}); // replace with your user ID
       });
   
-      socket.on('join room', (chatId) => {
-        console.log('New room joined', chatId);
-        socket.emit('join room', chatId);
+      socket.on('join room', () => {
+        if (chatId!=0){
+          console.log('New room joined', chatId);
+          socket.emit('join room', chatId);
+        }
       });
 
       socket.on('message received', (receivedMessage) => {
@@ -83,7 +92,7 @@ export default function ChatRoom() {
   
   useEffect(() => {
     getMessages();
-    if (socket) {
+    if (socket && chatId!=0) {
       socket.emit('join room', chatId);
     }
   }, [chatId]);
@@ -93,7 +102,7 @@ export default function ChatRoom() {
   return (
     <>
     {chatId != 0? (
-      <div className="min-h-full flex flex-col justify-between">
+      <div className="max-h-screen flex flex-col justify-between">
       <div className="bg-gray-800 py-2 px-4 text-gray-200 flex items-center justify-between">
         <h1 className="text-lg font-bold">Chatroom</h1>
         <div className="flex items-center space-x-4">
@@ -109,7 +118,8 @@ export default function ChatRoom() {
         </div>
       </div>
       <div className="flex-1 overflow-y-scroll p-4">
-        {messages.length > 0? (messages.map((message) => (
+        {messages.length > 0? (messages
+        .map((message) => (
             <div
               key={message.id}
               className={`flex flex-col space-y-1 mb-4 ${message.sender.id === uid ? '' : ''}`}
@@ -131,7 +141,8 @@ export default function ChatRoom() {
             </div>
          
         ))) : <></>}
-      </div>
+        <div  ref={messagesEndRef}/>
+      </div >
       <div className="bg-gray-200 py-2 px-4">
         <form onSubmit={(e) => e.preventDefault()}>
           <div className="flex items-center space-x-2">
