@@ -38,6 +38,7 @@ const ProfileModal: FC<Props> = ({ type, name, isFriend, isJoined, pictureUrl, i
     const [nameState, setNameState] = useState<string>(name);
     const [isFriendState, setIsFriendState] = useState<boolean>(isFriend);
     const [isJoinedState, setIsJoinedState] = useState<boolean>(isJoined);
+    const {chatId,setChatId} = useContext(ChatIdContext);
 
     const fetchUser = async () => {
         const res = await getUserByID(id);
@@ -57,25 +58,39 @@ const ProfileModal: FC<Props> = ({ type, name, isFriend, isJoined, pictureUrl, i
         setNameState(res.data.userRoomRelations.some((userRoomRelation) => userRoomRelation.user.id === uid))
     };
 
-
-    useEffect(() => {
-        setIsDarkMode(localStorage.getItem("darkMode") === "true")
-    }, [localStorage.getItem("darkMode")])
-
-    const {chatId,setChatId} = useContext(ChatIdContext);
+    const fecthRoomId = async () => {
+        const res = await getUserByID(id);
+        const resRoom = await getRooms();
+        const roomArrays = res.data.userRoomRelations.filter((room:Room)=> !room.isGroupChat).map((relation) => relation.room.id)
+        const userRooms = resRoom.data.filter((room:Room) => room.isGroupChat === false && roomArrays.includes(room.id));
+        const friendRoom = userRooms.map((room:Room) => room.userRoomRelations.filter((relation) => relation.user.id === uid));
+        if (friendRoom.length > 0) {
+            setChatId(friendRoom[0][0].id);
+        }
+    }
 
     const chatOrAddFriendHandler = () => {
-        if (isFriendState || isJoinedState) {
+        if (isJoinedState) {
             // chat
             setChatId(id);
+            closeModal();
+        } else if (isFriendState) {
+            // chat
+            fecthRoomId();
             closeModal();
         } else {
             // add friend
             if (type === 'Users') {
                 // add friend
                 console.log('add friend')
+                const formData = {
+                    name: name,
+                    isGroupChat: false,
+                    userIds: [uid,id],
+                    groupPicture: picture?picture.split(",")[1]+".png":""
+                }
                 const createChat = async () => {
-                    const res = await createRoom(name, false, [uid,id]);  
+                    const res = await createRoom(formData);  
                     fetchUser();
                 }  
                 createChat();
@@ -90,6 +105,11 @@ const ProfileModal: FC<Props> = ({ type, name, isFriend, isJoined, pictureUrl, i
             
         }
     }
+
+    useEffect(() => {
+        setIsDarkMode(localStorage.getItem("darkMode") === "true")
+    }, [localStorage.getItem("darkMode")])
+    
     return (
         <Modal
             isOpen={isOpen}
@@ -123,5 +143,6 @@ const ProfileModal: FC<Props> = ({ type, name, isFriend, isJoined, pictureUrl, i
         </Modal>
     )
 }
+
 
 export default ProfileModal;

@@ -33,7 +33,12 @@ export default function Chat(){
         const fetchMyProfile = async () => {
             const res = await getUserByID(uid);
             setMyProfile(()=>res.data);
-            setFriends(()=>res.data.userRoomRelations.map((friend) => friend.user.id));
+            const resRoom = await getRooms();
+            const roomArrays = res.data.userRoomRelations.filter((room:Room)=> !room.isGroupChat).map((relation) => relation.room.id)
+            const userRooms = resRoom.data.filter((room:Room) => room.isGroupChat === false && roomArrays.includes(room.id));
+            const friends = userRooms.map((room:Room) => room.userRoomRelations.filter((relation) => relation.user.id !== uid).map((relation) => relation.user.id.toString())).flat();
+            console.log(friends) 
+            setFriends(prevFriends => [...prevFriends, ...friends]);
         }
         fetchMyProfile();
     }, [])
@@ -51,7 +56,7 @@ export default function Chat(){
                         "profilePictureURL" : user.profilePictureUrl,
                         "nickname" : user.username,
                         "id" : user.id,
-                        "isFriend" : false
+                        "isFriend" : friends.includes(user.id.toString())
                     }))}
 
                     groups = {rooms.filter((room: Room) => room.isGroupChat).map((room: Room) => ({
