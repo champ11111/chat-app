@@ -1,5 +1,9 @@
-import { FC,useState } from 'react'
+import { FC,useState,useEffect,createContext } from 'react'
 import MyProfileModal from './MyProfileModal'
+import { getUID } from '../utils/jwtGet'
+import { getUserByID } from '../api/user'
+
+export const NameContext = createContext({})
 
 
 interface Props {
@@ -10,19 +14,23 @@ interface Props {
 
 const MyProfileCard: FC<Props> = ({profilePictureURL, nickname}) => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
+  const [newNickname, setNewNickname] = useState<string>(nickname);
+
+  
+  
   
     return (
-        <>
-            <MyProfileModal
-                isOpen={isModalOpen}
-                closeModal={() => setIsModalOpen(false)}
-            />
+        <>  <NameContext.Provider value={{newNickname,setNewNickname}}>
+                <MyProfileModal
+                    isOpen={isModalOpen}
+                    closeModal={() => setIsModalOpen(false)}
+                />
             <div
                 className='flex items-center justify-between p-2 mx-1 my-2 rounded-md bg-gray-100 border-b border-gray-300 dark:bg-gray-600 dark:border-gray-600 transition duration-500 ease-in-out hover:bg-gray-200 dark:hover:bg-gray-700transform hover:-translate-y-1 hover:scale-105'
                 onClick={() => setIsModalOpen(true)}
             >
                 <p className='self-start mt-2 ml-2 text-l font-bold text-gray-800 dark:text-white'>
-                    {nickname}
+                    {newNickname}
                 </p>
                 <div
                     className='w-14 h-14'
@@ -34,6 +42,7 @@ const MyProfileCard: FC<Props> = ({profilePictureURL, nickname}) => {
                     />
                 </div>
             </div>
+            </NameContext.Provider>
         </>
 
     // <div className='flex items-center justify-between p-2 mx-1 my-2 rounded-md bg-gray-100 border-b border-gray-300 dark:bg-gray-600 dark:border-gray-600'>

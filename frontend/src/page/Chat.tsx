@@ -24,13 +24,10 @@ export default function Chat(){
         const res = await getUserByID(uid);
         setMyProfile(()=>res.data);
         const resRoom = await getRooms();
-        console.log(resRoom)
         const roomArrays = res.data.userRoomRelations.filter((room:Room)=> !room.isGroupChat).map((relation) => relation.room.id)
-        console.log(roomArrays)
         const userRooms = resRoom.data.filter((room:Room) => room.isGroupChat === false && roomArrays.includes(room.id));
-        console.log(userRooms)
         const friends = userRooms.map((room:Room) => room.userRoomRelations.filter((relation) => relation.user.id !== uid).map((relation) => relation.user.id.toString())).flat();
-        console.log(friends) 
+     
         setFriends(prevFriends => [...prevFriends, ...friends]);
         setIsLoading(false);
     }

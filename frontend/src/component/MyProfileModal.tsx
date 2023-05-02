@@ -1,9 +1,10 @@
-import { useState, useEffect, FC,useRef } from "react";
+import { useState, useEffect, FC,useContext } from "react";
 import Modal from "react-modal";
 import { getUser,updateUser } from "../api/user";
 import { getUID } from "../utils/jwtGet"
 import { toast } from 'react-toastify'
 import { CameraOutlined } from '@ant-design/icons'
+import { NameContext } from "./MyProfileCard";
 
 
 interface Props {
@@ -34,6 +35,7 @@ const MyProfileModal: FC<Props> = ({
 }) => {
     const [id , setId] = useState<number>(0)
     const [nickname, setNickname] = useState<string>("");
+    const {newNickname,setNewNickname} = useContext(NameContext);
     const [email, setEmail] = useState<string>("");
     const [password, setPassword] = useState<string>("");
     const [profilePicture, setProfilePicture] = useState<string>("");
@@ -77,10 +79,10 @@ const MyProfileModal: FC<Props> = ({
         if (pictureFile) {
             formData.append('profilePicture', pictureFile, pictureFile.name);
         }
-        console.log(formData)
         const toastId = toast.loading('Updating Profile...')
         try{
             const res = await updateUser(id,formData)
+            setNewNickname(res.data.username)
             toast.update(toastId, {
                 render: 'Update success!',
                 type: 'success',

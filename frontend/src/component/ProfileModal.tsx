@@ -59,13 +59,20 @@ const ProfileModal: FC<Props> = ({ type, name, isFriend, isJoined, pictureUrl, i
     };
 
     const fecthRoomId = async () => {
+        console.log("start")
         const res = await getUserByID(id);
+        console.log("userId",res.data)
         const resRoom = await getRooms();
+        console.log("resRoom",resRoom.data)
         const roomArrays = res.data.userRoomRelations.filter((room:Room)=> !room.isGroupChat).map((relation) => relation.room.id)
+        console.log("roomArray",roomArrays)
         const userRooms = resRoom.data.filter((room:Room) => room.isGroupChat === false && roomArrays.includes(room.id));
-        const friendRoom = userRooms.map((room:Room) => room.userRoomRelations.filter((relation) => relation.user.id === uid));
-        if (friendRoom.length > 0) {
-            setChatId(friendRoom[0][0].id);
+        console.log("userRooms",userRooms)
+        for (let i = 0; i < userRooms.length; i++) {
+            if (userRooms[i].userRoomRelations.some((userRoomRelation) => userRoomRelation.user.id === uid)) {
+                setChatId(userRooms[i].id);
+                break;
+            }
         }
     }
 
